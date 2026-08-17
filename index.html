@@ -57,6 +57,7 @@
   .btn:active{transform:scale(.97)}
   .btn:disabled{opacity:.5;box-shadow:none}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);box-shadow:none}
+  .link-btn{background:none;border:none;color:var(--neon-amber);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:16px;text-decoration:underline}
 
   .photo-pick{
     width:120px;height:120px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;
@@ -162,22 +163,25 @@ const SUPABASE_URL = "https://qxilrbytbotkweyhhpcm.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_n19ifiWmYyROmzNgQEkpZQ_u0OdUghk";
 /* ========================================================= */
 
+const EMAIL_DOMAIN = "matchbaile.app"; // domínio fictício pra criar contas no Supabase
 let sb = null;
 try {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } catch(e) {
   document.addEventListener('DOMContentLoaded', ()=>{
     document.querySelector('#screen').innerHTML =
-      `<div class="big">⚙️</div><p>Configuração inválida do Supabase:<br><b>${e.message}</b><br><br>Confere se a SUPABASE_URL está no formato<br>https://xxxxx.supabase.co</p>`;
+      `<div class="big">⚙️</div><p>Configuração inválida do Supabase:<br><b>${e.message}</b></p>`;
   });
 }
+
 const $ = s => document.querySelector(s);
-const screenEl = $('#screen'), navEl = $('#nav');
-let me = null;            // meu perfil
+const screenEl = document.getElementById('screen') || document.querySelector('#screen');
+const navEl = document.getElementById('nav') || document.querySelector('#nav');
+let me = null;
 let tab = 'swipe';
-let deck = [];            // perfis para curtir
-let myLikes = new Set();  // ids que já curti
-let likedMe = new Set();  // ids que me curtiram
+let deck = [];
+let myLikes = new Set();
+let likedMe = new Set();
 
 function toast(msg){
   const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
@@ -185,59 +189,143 @@ function toast(msg){
 }
 function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 function igLink(ig){ return ig ? `<a href="https://instagram.com/${encodeURIComponent(ig.replace('@',''))}" target="_blank">@${esc(ig.replace('@',''))}</a>` : ''; }
+function toEmail(username){ return username.toLowerCase().trim() + '@' + EMAIL_DOMAIN; }
 
-/* ---------------- boot ---------------- */
+/* ============================================================
+   BOOT — verifica sessão existente
+   ============================================================ */
 async function boot(){
-  if(SUPABASE_URL.startsWith('COLE_AQUI')){
-    screenEl.innerHTML = `<div class="big">⚙️</div><p>Configure a URL e a chave do Supabase<br>no topo do arquivo (variáveis SUPABASE_URL e SUPABASE_ANON_KEY).</p>`;
+  if(!sb) return;
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){
+    showLogin();
     return;
   }
-  if(!sb) return; // erro de config já exibido acima
-  // se em 10s nada acontecer, mostra aviso
-  const slow = setTimeout(()=>{
-    screenEl.innerHTML = `<div class="big">🐢</div><p>Demorando demais pra conectar…<br>Verifica tua internet e se a URL do Supabase está certa.<br><br><button class="btn ghost" style="max-width:220px" onclick="location.reload()">Tentar de novo</button></p>`;
-  }, 10000);
+  // já tem sessão, busca perfil
+  const uid = session.user.id;
+  const { data: prof, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+  if(error){
+    showLogin();
+    return;
+  }
+  me = prof;
+  if(!me){ showProfileSetup(); return; }
+  render();
+}
+
+/* ============================================================
+   TELA DE LOGIN
+   ============================================================ */
+function showLogin(){
+  navEl.classList.add('hidden');
+  const scr = document.getElementById('screen');
+  scr.className = '';
+  scr.innerHTML = `
+    <h2>Entrar 🔥</h2>
+    <p class="sub">Faz login pra entrar na pista ou criar tua conta.</p>
+    <label>Usuário</label>
+    <input id="l-user" maxlength="40" placeholder="Seu nome de usuário" autocapitalize="none" autocorrect="off">
+    <label>Senha</label>
+    <input id="l-pass" type="password" maxlength="60" placeholder="Sua senha">
+    <button class="btn" id="l-go">Entrar</button>
+    <div style="text-align:center">
+      <button class="link-btn" id="l-reg">Não tem conta? Criar agora</button>
+    </div>`;
+  $('#l-go').onclick = doLogin;
+  $('#l-reg').onclick = showRegister;
+  // enter pra logar
+  $('#l-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+}
+
+async function doLogin(){
+  const user = $('#l-user').value.trim();
+  const pass = $('#l-pass').value;
+  if(!user){ toast('Coloca teu usuário!'); return; }
+  if(!pass){ toast('Coloca tua senha!'); return; }
+  const btn = $('#l-go'); btn.disabled = true; btn.textContent = 'Entrando…';
   try{
-    let { data:{ session }, error: sesErr } = await sb.auth.getSession();
-    if(sesErr) throw sesErr;
-    if(!session){
-      const { data, error } = await sb.auth.signInAnonymously();
-      if(error){
-        clearTimeout(slow);
-        screenEl.innerHTML = `<div class="big">🔐</div><p>Erro de login: <b>${esc(error.message)}</b><br><br>No Supabase, vá em <b>Authentication → Sign In / Up</b><br>e ative <b>Anonymous sign-ins</b>.</p>`;
-        return;
-      }
-      session = data.session;
-    }
-    const uid = session.user.id;
-    const { data: prof, error: profErr } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
-    if(profErr) throw profErr;
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: toEmail(user),
+      password: pass
+    });
+    if(error) throw error;
+    const uid = data.user.id;
+    const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
     me = prof;
-    clearTimeout(slow);
+    if(!me){ showProfileSetup(); return; }
     render();
   }catch(err){
-    clearTimeout(slow);
-    screenEl.innerHTML = `<div class="big">😵</div><p>Erro ao conectar:<br><b>${esc(err.message||String(err))}</b><br><br>Confere a URL, a anon key e se você rodou o SQL de setup.<br><br><button class="btn ghost" style="max-width:220px" onclick="location.reload()">Tentar de novo</button></p>`;
+    toast('Login falhou: ' + (err.message || err));
+    btn.disabled = false; btn.textContent = 'Entrar';
   }
 }
 
-function render(){
-  if(!me){ showSignup(); return; }
-  if(me.status === 'pending'){ showWaiting(); return; }
-  if(me.status === 'rejected'){ showRejected(); return; }
-  buildNav();
-  if(tab==='swipe') showSwipe();
-  else if(tab==='matches') showMatches();
-  else if(tab==='admin') showAdmin();
+/* ============================================================
+   TELA DE REGISTRO (criar conta)
+   ============================================================ */
+function showRegister(){
+  navEl.classList.add('hidden');
+  const scr = document.getElementById('screen');
+  scr.className = '';
+  scr.innerHTML = `
+    <h2>Criar conta 🪩</h2>
+    <p class="sub">Escolhe um usuário e senha pra entrar no Match Baile.</p>
+    <label>Usuário</label>
+    <input id="r-user" maxlength="40" placeholder="Escolha um nome de usuário" autocapitalize="none" autocorrect="off">
+    <label>Senha</label>
+    <input id="r-pass" type="password" maxlength="60" placeholder="Crie uma senha">
+    <label>Confirmar Senha</label>
+    <input id="r-pass2" type="password" maxlength="60" placeholder="Repita a senha">
+    <button class="btn" id="r-go">Criar conta</button>
+    <div style="text-align:center">
+      <button class="link-btn" id="r-back">Já tem conta? Entrar</button>
+    </div>`;
+  $('#r-go').onclick = doRegister;
+  $('#r-back').onclick = showLogin;
 }
 
-/* ---------------- cadastro ---------------- */
+async function doRegister(){
+  const user = $('#r-user').value.trim();
+  const pass = $('#r-pass').value;
+  const pass2 = $('#r-pass2').value;
+  if(!user){ toast('Escolhe um usuário!'); return; }
+  if(user.length < 3){ toast('Usuário precisa ter pelo menos 3 caracteres.'); return; }
+  if(!pass || pass.length < 4){ toast('Senha precisa ter pelo menos 4 caracteres.'); return; }
+  if(pass !== pass2){ toast('As senhas não batem!'); return; }
+  const btn = $('#r-go'); btn.disabled = true; btn.textContent = 'Criando…';
+  try{
+    const { data, error } = await sb.auth.signUp({
+      email: toEmail(user),
+      password: pass
+    });
+    if(error) throw error;
+    // login automático após registro
+    const { data: loginData, error: loginErr } = await sb.auth.signInWithPassword({
+      email: toEmail(user),
+      password: pass
+    });
+    if(loginErr) throw loginErr;
+    me = null;
+    showProfileSetup();
+  }catch(err){
+    let msg = err.message || String(err);
+    if(msg.includes('already registered')) msg = 'Esse usuário já existe. Tenta outro!';
+    toast(msg);
+    btn.disabled = false; btn.textContent = 'Criar conta';
+  }
+}
+
+/* ============================================================
+   TELA DE MONTAR PERFIL (após criar conta)
+   ============================================================ */
 let photoFile = null;
 let ticketFile = null;
-function showSignup(){
+
+function showProfileSetup(){
   navEl.classList.add('hidden');
-  screenEl.className='';
-  screenEl.innerHTML = `
+  const scr = document.getElementById('screen');
+  scr.className = '';
+  scr.innerHTML = `
     <h2>Entra na pista 🔥</h2>
     <p class="sub">Preenche teu perfil. A organização da festa aprova e aí é só dar match.</p>
     <div class="photo-pick" id="pp">📷</div>
@@ -265,10 +353,10 @@ function showSignup(){
       b.style.borderColor = 'var(--neon-green)'; b.style.color = 'var(--neon-green)';
     }
   };
-  $('#f-go').onclick = submitSignup;
+  $('#f-go').onclick = submitProfile;
 }
 
-async function submitSignup(){
+async function submitProfile(){
   const name = $('#f-name').value.trim();
   const age = parseInt($('#f-age').value);
   if(!name){ toast('Coloca teu nome!'); return; }
@@ -302,26 +390,47 @@ async function submitSignup(){
   }
 }
 
-/* ---------------- espera / rejeitado ---------------- */
+/* ============================================================
+   RENDER (despacha conforme status)
+   ============================================================ */
+function render(){
+  if(!me){ showLogin(); return; }
+  if(me.status === 'pending'){ showWaiting(); return; }
+  if(me.status === 'rejected'){ showRejected(); return; }
+  buildNav();
+  if(tab==='swipe') showSwipe();
+  else if(tab==='matches') showMatches();
+  else if(tab==='admin') showAdmin();
+}
+
 function showWaiting(){
   navEl.classList.add('hidden');
-  screenEl.className='empty';
-  screenEl.innerHTML = `
+  const scr = document.getElementById('screen');
+  scr.className='empty';
+  scr.innerHTML = `
     <div class="big pulse">🕐</div>
     <h2>Aguardando aprovação</h2>
     <p class="sub">A organização vai liberar teu perfil já já.<br>Volta aqui daqui a pouco!</p>
-    <button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button>`;
+    <button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button>
+    <button class="link-btn" onclick="doLogout()">Sair</button>`;
 }
 function showRejected(){
   navEl.classList.add('hidden');
-  screenEl.className='empty';
-  screenEl.innerHTML = `<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização da festa.</p>`;
+  const scr = document.getElementById('screen');
+  scr.className='empty';
+  scr.innerHTML = `<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização da festa.</p>
+    <button class="link-btn" onclick="doLogout()">Sair</button>`;
 }
 async function recheck(){
   const { data } = await sb.from('profiles').select('*').eq('id', me.id).maybeSingle();
   if(data) me = data;
   if(me.status==='pending') toast('Ainda em análise…');
   render();
+}
+async function doLogout(){
+  await sb.auth.signOut();
+  me = null;
+  showLogin();
 }
 
 /* ---------------- navegação ---------------- */
@@ -342,8 +451,9 @@ async function updatePendingBadge(){
 
 /* ---------------- swipe ---------------- */
 async function showSwipe(){
-  screenEl.className='';
-  screenEl.innerHTML = `<div class="empty"><div class="big pulse">♥</div></div>`;
+  const scr = document.getElementById('screen');
+  scr.className='';
+  scr.innerHTML = `<div class="empty"><div class="big pulse">♥</div></div>`;
   const [likesRes, likedMeRes, profRes] = await Promise.all([
     sb.from('likes').select('liked').eq('liker', me.id),
     sb.from('likes').select('liker').eq('liked', me.id),
@@ -357,15 +467,16 @@ async function showSwipe(){
 }
 
 function renderDeck(){
+  const scr = document.getElementById('screen');
   if(!deck.length){
-    screenEl.className='empty';
-    screenEl.innerHTML = `<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Você já viu geral. Volta mais tarde<br>pra ver quem chegou agora.</p>
+    scr.className='empty';
+    scr.innerHTML = `<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Você já viu geral. Volta mais tarde<br>pra ver quem chegou agora.</p>
       <button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;
     return;
   }
   const p = deck[0];
-  screenEl.className='';
-  screenEl.innerHTML = `
+  scr.className='';
+  scr.innerHTML = `
     <div class="deck"><div class="pcard" id="card">
       <img src="${esc(p.photo_url)}" alt="">
       <div class="stamp like">SIM</div>
@@ -435,8 +546,9 @@ function showMatch(p){
 
 /* ---------------- matches ---------------- */
 async function showMatches(){
-  screenEl.className='';
-  screenEl.innerHTML = `<h2>Seus matches ♥</h2><div id="mlist"><p class="sub">Carregando…</p></div>`;
+  const scr = document.getElementById('screen');
+  scr.className='';
+  scr.innerHTML = `<h2>Seus matches ♥</h2><div id="mlist"><p class="sub">Carregando…</p></div>`;
   const [a,b] = await Promise.all([
     sb.from('likes').select('liked').eq('liker', me.id),
     sb.from('likes').select('liker').eq('liked', me.id)
@@ -455,8 +567,9 @@ async function showMatches(){
 
 /* ---------------- admin ---------------- */
 async function showAdmin(){
-  screenEl.className='';
-  screenEl.innerHTML = `<h2>Aprovação de perfis 🛡</h2><div id="alist"><p class="sub">Carregando…</p></div>`;
+  const scr = document.getElementById('screen');
+  scr.className='';
+  scr.innerHTML = `<h2>Aprovação de perfis 🛡</h2><div id="alist"><p class="sub">Carregando…</p></div>`;
   const { data: pend } = await sb.from('profiles').select('*').eq('status','pending').order('created_at');
   const list = $('#alist');
   if(!pend || !pend.length){ list.innerHTML = `<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`; return; }

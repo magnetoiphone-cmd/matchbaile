@@ -162,7 +162,15 @@ const SUPABASE_URL = "COLE_AQUI_SUA_URL";        // ex: https://abcdxyz.supabase
 const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_ANON_KEY";
 /* ========================================================= */
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let sb = null;
+try {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch(e) {
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.querySelector('#screen').innerHTML =
+      `<div class="big">⚙️</div><p>Configuração inválida do Supabase:<br><b>${e.message}</b><br><br>Confere se a SUPABASE_URL está no formato<br>https://xxxxx.supabase.co</p>`;
+  });
+}
 const $ = s => document.querySelector(s);
 const screenEl = $('#screen'), navEl = $('#nav');
 let me = null;            // meu perfil
@@ -184,16 +192,33 @@ async function boot(){
     screenEl.innerHTML = `<div class="big">⚙️</div><p>Configure a URL e a chave do Supabase<br>no topo do arquivo (variáveis SUPABASE_URL e SUPABASE_ANON_KEY).</p>`;
     return;
   }
-  let { data:{ session } } = await sb.auth.getSession();
-  if(!session){
-    const { data, error } = await sb.auth.signInAnonymously();
-    if(error){ screenEl.innerHTML = `<div class="big">😵</div><p>Erro de login: ${esc(error.message)}<br>Ative "Anonymous sign-ins" no Supabase.</p>`; return; }
-    session = data.session;
+  if(!sb) return; // erro de config já exibido acima
+  // se em 10s nada acontecer, mostra aviso
+  const slow = setTimeout(()=>{
+    screenEl.innerHTML = `<div class="big">🐢</div><p>Demorando demais pra conectar…<br>Verifica tua internet e se a URL do Supabase está certa.<br><br><button class="btn ghost" style="max-width:220px" onclick="location.reload()">Tentar de novo</button></p>`;
+  }, 10000);
+  try{
+    let { data:{ session }, error: sesErr } = await sb.auth.getSession();
+    if(sesErr) throw sesErr;
+    if(!session){
+      const { data, error } = await sb.auth.signInAnonymously();
+      if(error){
+        clearTimeout(slow);
+        screenEl.innerHTML = `<div class="big">🔐</div><p>Erro de login: <b>${esc(error.message)}</b><br><br>No Supabase, vá em <b>Authentication → Sign In / Up</b><br>e ative <b>Anonymous sign-ins</b>.</p>`;
+        return;
+      }
+      session = data.session;
+    }
+    const uid = session.user.id;
+    const { data: prof, error: profErr } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+    if(profErr) throw profErr;
+    me = prof;
+    clearTimeout(slow);
+    render();
+  }catch(err){
+    clearTimeout(slow);
+    screenEl.innerHTML = `<div class="big">😵</div><p>Erro ao conectar:<br><b>${esc(err.message||String(err))}</b><br><br>Confere a URL, a anon key e se você rodou o SQL de setup.<br><br><button class="btn ghost" style="max-width:220px" onclick="location.reload()">Tentar de novo</button></p>`;
   }
-  const uid = session.user.id;
-  const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
-  me = prof;
-  render();
 }
 
 function render(){

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Match Baile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#050505;
+    --card:#111114;
+    --line:#232328;
+    --txt:#f5f2ee;
+    --dim:#9a948d;
+    --neon-red:#ff2b4a;
+    --neon-green:#2bff6f;
+    --neon-amber:#ffb02b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    background:var(--bg);color:var(--txt);
+    font-family:'Archivo',sans-serif;
+    min-height:100vh;min-height:100dvh;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .wrap{width:100%;max-width:430px;padding:20px 18px 90px;flex:1;display:flex;flex-direction:column}
+
+  /* ---------- logo neon ---------- */
+  .logo{font-family:'Monoton',cursive;text-align:center;line-height:.95;margin:14px 0 4px;user-select:none}
+  .logo .l1{font-size:44px;color:#fff;text-shadow:0 0 6px #fff,0 0 18px var(--neon-red),0 0 40px var(--neon-red)}
+  .logo .l2{font-size:44px;color:var(--neon-red);text-shadow:0 0 6px var(--neon-red),0 0 22px var(--neon-red)}
+  .hearts{text-align:center;font-size:20px;letter-spacing:8px;margin-bottom:18px}
+  .hearts span:nth-child(1){color:var(--neon-red);text-shadow:0 0 10px var(--neon-red)}
+  .hearts span:nth-child(2){color:var(--neon-amber);text-shadow:0 0 10px var(--neon-amber)}
+  .hearts span:nth-child(3){color:var(--neon-green);text-shadow:0 0 10px var(--neon-green)}
+
+  h2{font-weight:800;font-size:20px;margin-bottom:14px}
+  p.sub{color:var(--dim);font-size:14px;line-height:1.5;margin-bottom:18px}
+
+  /* ---------- forms ---------- */
+  label{display:block;font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px}
+  input,textarea{
+    width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    color:var(--txt);font-family:inherit;font-size:16px;padding:13px 14px;outline:none;
+  }
+  input:focus,textarea:focus{border-color:var(--neon-red);box-shadow:0 0 0 3px rgba(255,43,74,.18)}
+  textarea{resize:none;height:84px}
+  .btn{
+    width:100%;border:none;border-radius:14px;padding:15px;margin-top:20px;
+    font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;
+    background:var(--neon-red);color:#fff;
+    box-shadow:0 0 18px rgba(255,43,74,.45);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.5;box-shadow:none}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);box-shadow:none}
+
+  .photo-pick{
+    width:120px;height:120px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;
+    background:var(--card);border:2px dashed var(--line);cursor:pointer;overflow:hidden;font-size:34px;color:var(--dim);
+  }
+  .photo-pick img{width:100%;height:100%;object-fit:cover}
+
+  /* ---------- cards / swipe ---------- */
+  .deck{position:relative;flex:1;min-height:440px;margin-top:6px}
+  .pcard{
+    position:absolute;inset:0;border-radius:22px;overflow:hidden;background:var(--card);
+    border:1px solid var(--line);touch-action:none;
+    box-shadow:0 18px 40px rgba(0,0,0,.6);
+  }
+  .pcard img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15);pointer-events:none}
+  .pcard .info{
+    position:absolute;left:0;right:0;bottom:0;padding:70px 18px 18px;
+    background:linear-gradient(transparent,rgba(0,0,0,.92));
+  }
+  .pcard .info h3{font-size:24px;font-weight:800}
+  .pcard .info .ig{color:var(--neon-amber);font-size:14px;font-weight:600}
+  .pcard .info p{color:#cfcac4;font-size:14px;margin-top:6px;line-height:1.4}
+  .stamp{
+    position:absolute;top:26px;font-family:'Monoton',cursive;font-size:30px;padding:6px 14px;border:3px solid;border-radius:10px;
+    opacity:0;transform:rotate(-14deg);pointer-events:none;
+  }
+  .stamp.like{left:18px;color:var(--neon-green);border-color:var(--neon-green);text-shadow:0 0 12px var(--neon-green)}
+  .stamp.nope{right:18px;color:var(--neon-red);border-color:var(--neon-red);text-shadow:0 0 12px var(--neon-red);transform:rotate(14deg)}
+
+  .actions{display:flex;justify-content:center;gap:34px;margin-top:18px}
+  .act{
+    width:66px;height:66px;border-radius:50%;border:2px solid;background:rgba(0,0,0,.5);
+    font-size:28px;cursor:pointer;transition:transform .12s ease;
+  }
+  .act:active{transform:scale(.9)}
+  .act.no{color:var(--neon-red);border-color:var(--neon-red);box-shadow:0 0 14px rgba(255,43,74,.4)}
+  .act.yes{color:var(--neon-green);border-color:var(--neon-green);box-shadow:0 0 14px rgba(43,255,111,.4)}
+
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--dim);gap:10px}
+  .empty .big{font-size:44px}
+
+  /* ---------- match overlay ---------- */
+  .match-ov{
+    position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:50;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;
+  }
+  .match-ov h1{font-family:'Monoton',cursive;font-size:46px;color:var(--neon-green);text-shadow:0 0 10px var(--neon-green),0 0 34px var(--neon-green);text-align:center;line-height:1.1}
+  .match-ov img{width:130px;height:130px;border-radius:50%;object-fit:cover;border:3px solid var(--neon-green);filter:grayscale(1)}
+  .match-ov .ig{color:var(--neon-amber);font-size:18px;font-weight:600}
+
+  /* ---------- listas (matches / admin) ---------- */
+  .row{
+    display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:12px;margin-bottom:10px;
+  }
+  .row img{width:56px;height:56px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+  .row .rmain{flex:1;min-width:0}
+  .row .rmain b{display:block;font-size:15px}
+  .row .rmain span{color:var(--dim);font-size:13px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .rmain a{color:var(--neon-amber);font-size:13px;text-decoration:none;font-weight:600}
+  .mini{width:42px;height:42px;border-radius:50%;border:2px solid;background:transparent;font-size:17px;cursor:pointer;flex-shrink:0}
+  .mini.ok{color:var(--neon-green);border-color:var(--neon-green)}
+  .mini.no{color:var(--neon-red);border-color:var(--neon-red)}
+
+  /* ---------- tabs ---------- */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:6px;
+    background:rgba(5,5,5,.94);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom));
+    z-index:40;
+  }
+  nav button{
+    background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:13px;
+    padding:8px 16px;border-radius:20px;cursor:pointer;
+  }
+  nav button.on{color:#fff;background:var(--card);box-shadow:0 0 12px rgba(255,43,74,.35);color:var(--neon-red)}
+  .badge{background:var(--neon-red);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px;margin-left:4px}
+
+  .toast{
+    position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;
+    background:var(--card);border:1px solid var(--neon-red);color:#fff;
+    padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;
+    box-shadow:0 0 20px rgba(255,43,74,.4);max-width:90%;text-align:center;
+  }
+  .pulse{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  .hidden{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="logo"><div class="l1">MATCH</div><div class="l2">BAILE</div></div>
+  <div class="hearts"><span>♥</span><span>♥</span><span>♥</span></div>
+  <div id="screen" class="empty"><div class="big pulse">♥</div><p>Carregando…</p></div>
+</div>
+<nav id="nav" class="hidden"></nav>
+
+<script>
+/* =========================================================
+   CONFIGURE AQUI  →  Supabase > Project Settings > API
+   ========================================================= */
+const SUPABASE_URL = "COLE_AQUI_SUA_URL";        // ex: https://abcdxyz.supabase.co
+const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_ANON_KEY";
+/* ========================================================= */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = s => document.querySelector(s);
+const screenEl = $('#screen'), navEl = $('#nav');
+let me = null;            // meu perfil
+let tab = 'swipe';
+let deck = [];            // perfis para curtir
+let myLikes = new Set();  // ids que já curti
+let likedMe = new Set();  // ids que me curtiram
+
+function toast(msg){
+  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 3000);
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function igLink(ig){ return ig ? `<a href="https://instagram.com/${encodeURIComponent(ig.replace('@',''))}" target="_blank">@${esc(ig.replace('@',''))}</a>` : ''; }
+
+/* ---------------- boot ---------------- */
+async function boot(){
+  if(SUPABASE_URL.startsWith('COLE_AQUI')){
+    screenEl.innerHTML = `<div class="big">⚙️</div><p>Configure a URL e a chave do Supabase<br>no topo do arquivo (variáveis SUPABASE_URL e SUPABASE_ANON_KEY).</p>`;
+    return;
+  }
+  let { data:{ session } } = await sb.auth.getSession();
+  if(!session){
+    const { data, error } = await sb.auth.signInAnonymously();
+    if(error){ screenEl.innerHTML = `<div class="big">😵</div><p>Erro de login: ${esc(error.message)}<br>Ative "Anonymous sign-ins" no Supabase.</p>`; return; }
+    session = data.session;
+  }
+  const uid = session.user.id;
+  const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+  me = prof;
+  render();
+}
+
+function render(){
+  if(!me){ showSignup(); return; }
+  if(me.status === 'pending'){ showWaiting(); return; }
+  if(me.status === 'rejected'){ showRejected(); return; }
+  buildNav();
+  if(tab==='swipe') showSwipe();
+  else if(tab==='matches') showMatches();
+  else if(tab==='admin') showAdmin();
+}
+
+/* ---------------- cadastro ---------------- */
+let photoFile = null;
+let ticketFile = null;
+function showSignup(){
+  navEl.classList.add('hidden');
+  screenEl.className='';
+  screenEl.innerHTML = `
+    <h2>Entra na pista 🔥</h2>
+    <p class="sub">Preenche teu perfil. A organização da festa aprova e aí é só dar match.</p>
+    <div class="photo-pick" id="pp">📷</div>
+    <input type="file" id="file" accept="image/*" class="hidden">
+    <label>Nome</label><input id="f-name" maxlength="40" placeholder="Como te chamam na pista">
+    <label>Idade</label><input id="f-age" type="number" min="18" max="99" placeholder="18+">
+    <label>Instagram</label><input id="f-ig" maxlength="40" placeholder="@seu_perfil">
+    <label>Bio</label><textarea id="f-bio" maxlength="160" placeholder="Fala algo que faça alguém arrastar pra direita"></textarea>
+    <label>Print do ingresso 🎟</label>
+    <button class="btn ghost" id="t-pick" style="margin-top:0">Anexar print do ingresso</button>
+    <input type="file" id="t-file" accept="image/*" class="hidden">
+    <p class="sub" style="margin:8px 0 0;font-size:12px">Só a organização vê o ingresso. Ele não aparece no seu perfil.</p>
+    <button class="btn" id="f-go">Enviar pra aprovação</button>`;
+  $('#pp').onclick = () => $('#file').click();
+  $('#file').onchange = e => {
+    photoFile = e.target.files[0];
+    if(photoFile){ $('#pp').innerHTML = `<img src="${URL.createObjectURL(photoFile)}">`; }
+  };
+  $('#t-pick').onclick = () => $('#t-file').click();
+  $('#t-file').onchange = e => {
+    ticketFile = e.target.files[0];
+    if(ticketFile){
+      const b = $('#t-pick');
+      b.textContent = '🎟 ' + ticketFile.name + ' ✓';
+      b.style.borderColor = 'var(--neon-green)'; b.style.color = 'var(--neon-green)';
+    }
+  };
+  $('#f-go').onclick = submitSignup;
+}
+
+async function submitSignup(){
+  const name = $('#f-name').value.trim();
+  const age = parseInt($('#f-age').value);
+  if(!name){ toast('Coloca teu nome!'); return; }
+  if(!age || age < 18){ toast('Festa é 18+ 😉'); return; }
+  if(!photoFile){ toast('Escolhe uma foto!'); return; }
+  if(!ticketFile){ toast('Anexa o print do ingresso! 🎟'); return; }
+  const btn = $('#f-go'); btn.disabled = true; btn.textContent = 'Enviando…';
+  try{
+    const { data:{ user } } = await sb.auth.getUser();
+    const ext = (photoFile.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const up = await sb.storage.from('fotos').upload(path, photoFile);
+    if(up.error) throw up.error;
+    const photo_url = sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;
+    const text = (ticketFile.name.split('.').pop() || 'jpg').toLowerCase();
+    const ticket_path = `${user.id}/ingresso-${Date.now()}.${text}`;
+    const upT = await sb.storage.from('ingressos').upload(ticket_path, ticketFile);
+    if(upT.error) throw upT.error;
+    const ins = await sb.from('profiles').insert({
+      id: user.id, name, age,
+      instagram: $('#f-ig').value.trim(),
+      bio: $('#f-bio').value.trim(),
+      photo_url, ticket_path
+    }).select().single();
+    if(ins.error) throw ins.error;
+    me = ins.data;
+    render();
+  }catch(err){
+    toast('Erro: ' + err.message);
+    btn.disabled = false; btn.textContent = 'Enviar pra aprovação';
+  }
+}
+
+/* ---------------- espera / rejeitado ---------------- */
+function showWaiting(){
+  navEl.classList.add('hidden');
+  screenEl.className='empty';
+  screenEl.innerHTML = `
+    <div class="big pulse">🕐</div>
+    <h2>Aguardando aprovação</h2>
+    <p class="sub">A organização vai liberar teu perfil já já.<br>Volta aqui daqui a pouco!</p>
+    <button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button>`;
+}
+function showRejected(){
+  navEl.classList.add('hidden');
+  screenEl.className='empty';
+  screenEl.innerHTML = `<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização da festa.</p>`;
+}
+async function recheck(){
+  const { data } = await sb.from('profiles').select('*').eq('id', me.id).maybeSingle();
+  if(data) me = data;
+  if(me.status==='pending') toast('Ainda em análise…');
+  render();
+}
+
+/* ---------------- navegação ---------------- */
+function buildNav(){
+  navEl.classList.remove('hidden');
+  navEl.innerHTML = `
+    <button data-t="swipe" class="${tab==='swipe'?'on':''}">🔥 Pista</button>
+    <button data-t="matches" class="${tab==='matches'?'on':''}">♥ Matches</button>
+    ${me.is_admin ? `<button data-t="admin" class="${tab==='admin'?'on':''}">🛡 Admin<span id="pend-badge"></span></button>` : ''}`;
+  navEl.querySelectorAll('button').forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+  if(me.is_admin) updatePendingBadge();
+}
+async function updatePendingBadge(){
+  const { count } = await sb.from('profiles').select('*',{count:'exact',head:true}).eq('status','pending');
+  const el = $('#pend-badge');
+  if(el && count) el.innerHTML = `<span class="badge">${count}</span>`;
+}
+
+/* ---------------- swipe ---------------- */
+async function showSwipe(){
+  screenEl.className='';
+  screenEl.innerHTML = `<div class="empty"><div class="big pulse">♥</div></div>`;
+  const [likesRes, likedMeRes, profRes] = await Promise.all([
+    sb.from('likes').select('liked').eq('liker', me.id),
+    sb.from('likes').select('liker').eq('liked', me.id),
+    sb.from('profiles').select('*').eq('status','approved').neq('id', me.id)
+  ]);
+  myLikes = new Set((likesRes.data||[]).map(l=>l.liked));
+  likedMe = new Set((likedMeRes.data||[]).map(l=>l.liker));
+  deck = (profRes.data||[]).filter(p=>!myLikes.has(p.id));
+  deck.sort(()=>Math.random()-.5);
+  renderDeck();
+}
+
+function renderDeck(){
+  if(!deck.length){
+    screenEl.className='empty';
+    screenEl.innerHTML = `<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Você já viu geral. Volta mais tarde<br>pra ver quem chegou agora.</p>
+      <button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;
+    return;
+  }
+  const p = deck[0];
+  screenEl.className='';
+  screenEl.innerHTML = `
+    <div class="deck"><div class="pcard" id="card">
+      <img src="${esc(p.photo_url)}" alt="">
+      <div class="stamp like">SIM</div>
+      <div class="stamp nope">NÃO</div>
+      <div class="info">
+        <h3>${esc(p.name)}, ${p.age||'?'}</h3>
+        <div class="ig">${p.instagram ? '@'+esc(p.instagram.replace('@','')) : ''}</div>
+        <p>${esc(p.bio)}</p>
+      </div>
+    </div></div>
+    <div class="actions">
+      <button class="act no" onclick="swipe(false)">✖</button>
+      <button class="act yes" onclick="swipe(true)">♥</button>
+    </div>`;
+  attachDrag($('#card'));
+}
+
+function attachDrag(card){
+  let sx=0, dx=0, dragging=false;
+  const likeStamp = card.querySelector('.stamp.like');
+  const nopeStamp = card.querySelector('.stamp.nope');
+  card.addEventListener('pointerdown', e=>{ dragging=true; sx=e.clientX; card.setPointerCapture(e.pointerId); });
+  card.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    dx = e.clientX - sx;
+    card.style.transform = `translateX(${dx}px) rotate(${dx/18}deg)`;
+    likeStamp.style.opacity = Math.max(0, dx/90);
+    nopeStamp.style.opacity = Math.max(0, -dx/90);
+  });
+  const end = ()=>{
+    if(!dragging) return; dragging=false;
+    if(dx > 110) swipe(true);
+    else if(dx < -110) swipe(false);
+    else { card.style.transition='transform .2s'; card.style.transform=''; likeStamp.style.opacity=0; nopeStamp.style.opacity=0; }
+    dx=0;
+  };
+  card.addEventListener('pointerup', end);
+  card.addEventListener('pointercancel', end);
+}
+
+async function swipe(liked){
+  const p = deck.shift();
+  const card = $('#card');
+  if(card){
+    card.style.transition = 'transform .3s ease, opacity .3s';
+    card.style.transform = `translateX(${liked?500:-500}px) rotate(${liked?25:-25}deg)`;
+    card.style.opacity = 0;
+  }
+  if(liked){
+    const { error } = await sb.from('likes').insert({ liker: me.id, liked: p.id });
+    if(!error && likedMe.has(p.id)) showMatch(p);
+  }
+  setTimeout(renderDeck, 280);
+}
+
+function showMatch(p){
+  const ov = document.createElement('div');
+  ov.className='match-ov';
+  ov.innerHTML = `
+    <h1>DEU<br>MATCH!</h1>
+    <img src="${esc(p.photo_url)}">
+    <div><b style="font-size:20px">${esc(p.name)}</b></div>
+    <div class="ig">${p.instagram ? '@'+esc(p.instagram.replace('@','')) : ''}</div>
+    <button class="btn" style="max-width:240px" onclick="this.parentElement.remove()">Continuar na pista</button>`;
+  document.body.appendChild(ov);
+}
+
+/* ---------------- matches ---------------- */
+async function showMatches(){
+  screenEl.className='';
+  screenEl.innerHTML = `<h2>Seus matches ♥</h2><div id="mlist"><p class="sub">Carregando…</p></div>`;
+  const [a,b] = await Promise.all([
+    sb.from('likes').select('liked').eq('liker', me.id),
+    sb.from('likes').select('liker').eq('liked', me.id)
+  ]);
+  const iLiked = new Set((a.data||[]).map(x=>x.liked));
+  const ids = (b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));
+  const list = $('#mlist');
+  if(!ids.length){ list.innerHTML = `<p class="sub">Nenhum match ainda. Bora arrastar pra direita! 🔥</p>`; return; }
+  const { data: profs } = await sb.from('profiles').select('*').in('id', ids);
+  list.innerHTML = (profs||[]).map(p=>`
+    <div class="row">
+      <img src="${esc(p.photo_url)}">
+      <div class="rmain"><b>${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
+    </div>`).join('');
+}
+
+/* ---------------- admin ---------------- */
+async function showAdmin(){
+  screenEl.className='';
+  screenEl.innerHTML = `<h2>Aprovação de perfis 🛡</h2><div id="alist"><p class="sub">Carregando…</p></div>`;
+  const { data: pend } = await sb.from('profiles').select('*').eq('status','pending').order('created_at');
+  const list = $('#alist');
+  if(!pend || !pend.length){ list.innerHTML = `<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`; return; }
+  list.innerHTML = pend.map(p=>`
+    <div class="row" id="row-${p.id}">
+      <img src="${esc(p.photo_url)}">
+      <div class="rmain"><b>${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
+      <button class="mini" style="color:var(--neon-amber);border-color:var(--neon-amber)" onclick="viewTicket('${esc(p.ticket_path||'')}')">🎟</button>
+      <button class="mini no" onclick="moderate('${p.id}','rejected')">✖</button>
+      <button class="mini ok" onclick="moderate('${p.id}','approved')">✓</button>
+    </div>`).join('');
+}
+async function viewTicket(path){
+  if(!path){ toast('Esse perfil não enviou ingresso.'); return; }
+  const { data, error } = await sb.storage.from('ingressos').createSignedUrl(path, 300);
+  if(error){ toast('Erro ao abrir ingresso: '+error.message); return; }
+  const ov = document.createElement('div');
+  ov.className='match-ov';
+  ov.innerHTML = `
+    <h2 style="color:var(--neon-amber)">Ingresso 🎟</h2>
+    <img src="${data.signedUrl}" style="width:auto;max-width:92vw;max-height:65vh;height:auto;border-radius:14px;border:2px solid var(--neon-amber);filter:none;object-fit:contain">
+    <button class="btn ghost" style="max-width:200px" onclick="this.parentElement.remove()">Fechar</button>`;
+  document.body.appendChild(ov);
+}
+async function moderate(id, status){
+  const { error } = await sb.from('profiles').update({ status }).eq('id', id);
+  if(error){ toast('Erro: '+error.message); return; }
+  const row = $('#row-'+id); if(row) row.remove();
+  updatePendingBadge();
+  if(!$('#alist').children.length) $('#alist').innerHTML = `<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`;
+}
+
+boot();
+</script>
+</body>
+</html>

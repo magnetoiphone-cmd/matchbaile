@@ -279,20 +279,19 @@ let setupPhotos=[],ticketFile=null;
 function showProfileSetup(ig){$('#nav').classList.add('hidden');setupPhotos=[];ticketFile=null;const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Entra na pista 🔥</h2><p class="sub">Monta teu perfil com até 6 fotos.</p><div class="photo-grid" id="pgrid"></div><input type="file" id="pfile" accept="image/*" class="hidden" multiple><label>Nome</label><input id="f-name" maxlength="40" placeholder="Como te chamam na pista"><label>Idade</label><input id="f-age" type="number" min="18" max="99" placeholder="18+"><label>Instagram</label><input id="f-ig" maxlength="40" placeholder="@seu_perfil" value="${esc(ig||'')}"><label>Gênero</label><select id="f-gender"><option value="">Selecione</option><option value="homem">Homem</option><option value="mulher">Mulher</option><option value="outro">Outro</option></select><label>Quero ver</label><select id="f-pref"><option value="todos">Todos</option><option value="homens">Homens</option><option value="mulheres">Mulheres</option></select><label>Bio</label><textarea id="f-bio" maxlength="160" placeholder="Fala algo que faça alguém arrastar pra direita"></textarea><label>Print do ingresso 🎟</label><button class="btn ghost" id="t-pick" style="margin-top:0">Anexar print do ingresso</button><input type="file" id="t-file" accept="image/*" class="hidden"><p class="sub" style="margin:6px 0 0;font-size:12px">Só a organização vê o ingresso.</p><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a><button class="btn" id="f-go">Enviar pra aprovação</button>`;renderPhotoGrid();$('#pfile').onchange=e=>{for(const f of e.target.files){if(setupPhotos.length<6)setupPhotos.push({file:f,url:URL.createObjectURL(f)})}renderPhotoGrid()};$('#t-pick').onclick=()=>$('#t-file').click();$('#t-file').onchange=e=>{ticketFile=e.target.files[0];if(ticketFile){$('#t-pick').textContent='🎟 '+ticketFile.name+' ✓';$('#t-pick').style.borderColor='var(--neon-green)';$('#t-pick').style.color='var(--neon-green)'}};$('#f-go').onclick=submitProfile}
 function renderPhotoGrid(){const g=$('#pgrid');let h='';for(let i=0;i<6;i++){const p=setupPhotos[i];const c=i===0?'photo-slot main':'photo-slot';if(p)h+=`<div class="${c}"><img src="${p.url}"><div class="remove" onclick="removeSetupPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#pfile').click()">+</div>`}g.innerHTML=h}
 function removeSetupPhoto(i){setupPhotos.splice(i,1);renderPhotoGrid()}
-async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}if(!ticketFile){toast('Anexa o print do ingresso! 🎟');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const ext=(p.file.name.split('.').pop()||'jpg').toLowerCase();const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,p.file);if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const te=(ticketFile.name.split('.').pop()||'jpg').toLowerCase();const tp=`${user.id}/ingresso-${Date.now()}.${te}`;const{error:ue}=await sb.storage.from('ingressos').upload(tp,ticketFile);if(ue)throw ue;const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,ticket_path:tp}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Enviar pra aprovação'}}
+async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}if(!ticketFile){toast('Anexa o print do ingresso! 🎟');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const ext=(p.file.name.split('.').pop()||'jpg').toLowerCase();const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,p.file);if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const te=(ticketFile.name.split('.').pop()||'jpg').toLowerCase();const tp=`${user.id}/ingresso-${Date.now()}.${te}`;const{error:ue}=await sb.storage.from('ingressos').upload(tp,ticketFile);if(ue)throw ue;const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,ticket_path:tp,status:'approved'}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Enviar pra aprovação'}}
 
 /* ============ RENDER ============ */
-function render(){if(!me){showLogin();return}if(me.status==='pending'){showWaiting();return}if(me.status==='rejected'){showRejected();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
-function showWaiting(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big pulse">🕐</div><h2>Aguardando aprovação</h2><p class="sub">A organização vai liberar teu perfil já já.</p><button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a><button class="link-btn" onclick="doLogout()">Sair</button>`}
-function showRejected(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização.</p><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a><button class="link-btn" onclick="doLogout()">Sair</button>`}
-async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;if(me.status==='pending')toast('Ainda em análise…');render()}
+function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
+function showBanned(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">🚫</div><h2>Conta suspensa</h2><p class="sub">Sua conta foi suspensa pela organização da festa. Entre em contato se achar que foi um engano.</p><button class="link-btn" onclick="doLogout()">Sair</button>`}
+async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;render()}
 async function doLogout(){if(chatSub)chatSub.unsubscribe();await sb.auth.signOut();me=null;showLogin()}
 
 function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">🔥 Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">💬 Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">🏆 Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">👤 Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">🛡<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
-async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('status','pending');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
+async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
 
 /* ============ SWIPE ============ */
-async function showSwipe(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="empty"><div class="big pulse">🔥</div></div>`;const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').neq('id',me.id)]);myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');const lmArr=[...likedMe];filtered.sort((a,b)=>{const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;if(aL!==bL)return bL-aL;return Math.random()-.5});deck=filtered;renderDeck()}
+async function showSwipe(){const s=$('#screen');s.className='screen-enter';let banner='';if(!me.visible)banner=`<div style="background:var(--card);border:1px solid var(--neon-amber);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--neon-amber);text-align:center;animation:fadeUp .4s ease">⏳ Seu perfil ainda não está visível pra outros. A organização vai liberar em breve!</div>`;s.innerHTML=banner+`<div class="empty"><div class="big pulse">🔥</div></div>`;const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');const lmArr=[...likedMe];filtered.sort((a,b)=>{const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;if(aL!==bL)return bL-aL;return Math.random()-.5});deck=filtered;renderDeck()}
 let cardPhotoIdx=0;
 function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">↩</button><button class="act no" onclick="swipe('nope')">✖</button><button class="act superl" onclick="swipe('super')">⭐</button><button class="act yes" onclick="swipe('like')">♥</button></div>`;attachDrag($('#card'))}
 function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);cardPhotoIdx=Math.max(0,Math.min(photos.length-1,cardPhotoIdx+dir));const img=$('#card-img');if(img){img.style.opacity=0;setTimeout(()=>{img.src=photos[cardPhotoIdx];img.style.opacity=1},150)}document.querySelectorAll('#card .photo-dots span').forEach((d,i)=>d.className=i===cardPhotoIdx?'on':'')}
@@ -323,7 +322,7 @@ async function showRanking(){
   // busca todos os likes e perfis aprovados
   const[likesRes,profsRes]=await Promise.all([
     sb.from('likes').select('liked,is_super'),
-    sb.from('profiles').select('*').eq('status','approved')
+    sb.from('profiles').select('*').eq('status','approved').eq('visible',true)
   ]);
   const likes=likesRes.data||[];
   const profs=profsRes.data||[];
@@ -399,9 +398,93 @@ async function addEditPhotos(e){const files=[...e.target.files];const photos=get
 async function saveProfile(){const name=$('#e-name').value.trim(),age=parseInt($('#e-age').value);if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Idade inválida.');return}const updates={name,age,instagram:$('#e-ig').value.trim(),gender:$('#e-gender').value,preference:$('#e-pref').value,bio:$('#e-bio').value.trim(),photos:me.photos||[],photo_url:(me.photos&&me.photos[0])||me.photo_url};const{error}=await sb.from('profiles').update(updates).eq('id',me.id);if(error){toast(traduzir(error.message));return}Object.assign(me,updates);toast('Perfil salvo! ✓')}
 
 /* ============ ADMIN ============ */
-async function showAdmin(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Aprovação de perfis 🛡</h2><div id="alist"><p class="sub">Carregando…</p></div>`;const{data:pend}=await sb.from('profiles').select('*').eq('status','pending').order('created_at');const list=$('#alist');if(!pend||!pend.length){list.innerHTML=`<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`;return}list.innerHTML=pend.map(p=>`<div class="row" id="row-${p.id}" style="cursor:default"><img src="${esc(getPhotos(p)[0]||p.photo_url)}"><div class="rmain"><b>${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div><button class="mini" style="color:var(--neon-amber);border-color:var(--neon-amber)" onclick="viewTicket('${esc(p.ticket_path||'')}')">🎟</button><button class="mini no" onclick="moderate('${p.id}','rejected')">✖</button><button class="mini ok" onclick="moderate('${p.id}','approved')">✓</button></div>`).join('')}
+let adminTab='pending';
+async function showAdmin(){
+  const s=$('#screen');s.className='screen-enter';
+  s.innerHTML=`<h2>Painel Admin 🛡</h2>
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">📋 Aprovar</button>
+      <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">👥 Usuários</button>
+    </div>
+    <div id="admin-content"><p class="sub pulse">Carregando…</p></div>`;
+  if(adminTab==='pending') loadAdminPending();
+  else loadAdminUsers();
+}
+
+async function loadAdminPending(){
+  const{data:pend}=await sb.from('profiles').select('*').eq('visible',false).eq('status','approved').order('created_at');
+  const c=$('#admin-content');
+  if(!pend||!pend.length){c.innerHTML=`<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`;return}
+  c.innerHTML=`<p class="sub">${pend.length} perfil(is) aguardando liberação</p>`+pend.map(p=>`
+    <div class="row" id="row-${p.id}" style="cursor:default">
+      <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+      <div class="rmain"><b>${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
+      <button class="mini" style="color:var(--neon-amber);border-color:var(--neon-amber)" onclick="viewTicket('${esc(p.ticket_path||'')}')">🎟</button>
+      <button class="mini no" onclick="rejectProfile('${p.id}')">✖</button>
+      <button class="mini ok" onclick="approveProfile('${p.id}')">✓</button>
+    </div>`).join('');
+}
+
+async function loadAdminUsers(){
+  const{data:users}=await sb.from('profiles').select('*').neq('id',me.id).order('name');
+  const c=$('#admin-content');
+  if(!users||!users.length){c.innerHTML=`<p class="sub">Nenhum usuário cadastrado.</p>`;return}
+  const banned=users.filter(u=>u.status==='banned');
+  const active=users.filter(u=>u.status!=='banned');
+  let h=`<p class="sub">${active.length} ativo(s) · ${banned.length} banido(s)</p>`;
+  h+=active.map(p=>{
+    const vis=p.visible?'🟢':'🔴';
+    return `<div class="row" id="urow-${p.id}" style="cursor:default">
+      <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+      <div class="rmain"><b>${vis} ${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
+      ${!p.visible?`<button class="mini ok" onclick="approveProfile('${p.id}')" title="Liberar">✓</button>`:''}
+      <button class="mini no" onclick="banUser('${p.id}','${esc(p.name)}')" title="Banir">🚫</button>
+    </div>`;
+  }).join('');
+  if(banned.length){
+    h+=`<label style="margin-top:14px">Banidos</label>`;
+    h+=banned.map(p=>`
+      <div class="row" id="urow-${p.id}" style="cursor:default;opacity:.6">
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <div class="rmain"><b>🚫 ${esc(p.name)}</b>${igLink(p.instagram)}</div>
+        <button class="mini ok" onclick="unbanUser('${p.id}')" title="Desbanir">↩</button>
+      </div>`).join('');
+  }
+  c.innerHTML=h;
+}
+
+async function approveProfile(id){
+  const{error}=await sb.from('profiles').update({visible:true}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  const row=$('#row-'+id)||$('#urow-'+id);
+  if(row){row.style.transition='transform .3s,opacity .3s';row.style.transform='translateX(100%)';row.style.opacity='0';setTimeout(()=>row.remove(),300)}
+  toast('Perfil liberado! ✓');updatePendingBadge();
+  setTimeout(()=>showAdmin(),400);
+}
+
+async function rejectProfile(id){
+  const{error}=await sb.from('profiles').update({visible:false,status:'rejected'}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  const row=$('#row-'+id);
+  if(row){row.style.transition='transform .3s,opacity .3s';row.style.transform='translateX(-100%)';row.style.opacity='0';setTimeout(()=>row.remove(),300)}
+  toast('Perfil rejeitado.');updatePendingBadge();
+  setTimeout(()=>showAdmin(),400);
+}
+
+async function banUser(id,name){
+  if(!confirm(`Banir ${name}? A pessoa será removida do app.`))return;
+  const{error}=await sb.from('profiles').update({status:'banned',visible:false}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast(`${name} foi banido. 🚫`);showAdmin();
+}
+
+async function unbanUser(id){
+  const{error}=await sb.from('profiles').update({status:'approved',visible:false}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Usuário desbanido. Perfil voltou pra fila de aprovação.');showAdmin();
+}
 async function viewTicket(path){if(!path){toast('Sem ingresso.');return}const{data,error}=await sb.storage.from('ingressos').createSignedUrl(path,300);if(error){toast('Erro: '+traduzir(error.message));return}const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h2 style="color:var(--neon-amber)">Ingresso 🎟</h2><img src="${data.signedUrl}" style="width:auto;max-width:92vw;max-height:65vh;height:auto;border-radius:14px;border:2px solid var(--neon-amber);filter:none;object-fit:contain"><button class="btn ghost" style="max-width:200px" onclick="this.parentElement.remove()">Fechar</button>`;document.body.appendChild(ov)}
-async function moderate(id,status){const{error}=await sb.from('profiles').update({status}).eq('id',id);if(error){toast('Erro: '+traduzir(error.message));return}const row=$('#row-'+id);if(row){row.style.transition='transform .3s,opacity .3s';row.style.transform='translateX('+(status==='approved'?'':'−')+'100%)';row.style.opacity='0';setTimeout(()=>row.remove(),300)}updatePendingBadge();setTimeout(()=>{if($('#alist')&&!$('#alist').children.length)$('#alist').innerHTML=`<p class="sub">Tudo em dia ✅</p>`},350)}
+async function moderate(id,status){toast('Use as funções de aprovar/banir.');}
 
 boot();
 </script>

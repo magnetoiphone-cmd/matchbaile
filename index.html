@@ -33,6 +33,9 @@ textarea{resize:none;height:80px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);box-shadow:none}
 .btn.sm{padding:10px 16px;font-size:14px;width:auto;margin-top:10px}
 .link-btn{background:none;border:none;color:var(--neon-amber);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;text-decoration:underline}
+.ticket-cta{display:block;text-align:center;margin:16px 0;padding:14px;border-radius:14px;border:2px solid var(--neon-amber);color:var(--neon-amber);font-family:inherit;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 0 16px rgba(255,176,43,.3);transition:transform .12s ease}
+.ticket-cta:active{transform:scale(.97)}
+.ticket-cta span{font-size:18px}
 
 /* photo grid */
 .photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
@@ -179,7 +182,8 @@ function showLogin(){
     <label>@ do Instagram</label><input id="l-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off">
     <label>Senha</label><input id="l-pass" type="password" maxlength="60" placeholder="Sua senha">
     <button class="btn" id="l-go">Entrar</button>
-    <div style="text-align:center"><button class="link-btn" id="l-reg">Não tem conta? Criar agora</button></div>`;
+    <div style="text-align:center"><button class="link-btn" id="l-reg">Não tem conta? Criar agora</button></div>
+    <a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;
   $('#l-go').onclick=doLogin;$('#l-reg').onclick=showRegister;
   $('#l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 }
@@ -201,7 +205,8 @@ function showRegister(){
     <label>Senha (mínimo 6 caracteres)</label><input id="r-pass" type="password" maxlength="60" placeholder="Crie uma senha">
     <label>Confirmar senha</label><input id="r-pass2" type="password" maxlength="60" placeholder="Repita a senha">
     <button class="btn" id="r-go">Criar conta</button>
-    <div style="text-align:center"><button class="link-btn" id="r-back">Já tem conta? Entrar</button></div>`;
+    <div style="text-align:center"><button class="link-btn" id="r-back">Já tem conta? Entrar</button></div>
+    <a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;
   $('#r-go').onclick=doRegister;$('#r-back').onclick=showLogin;
 }
 async function doRegister(){
@@ -302,11 +307,15 @@ function render(){
 function showWaiting(){
   $('#nav').classList.add('hidden');const s=$('#screen');s.className='empty';
   s.innerHTML=`<div class="big pulse">🕐</div><h2>Aguardando aprovação</h2><p class="sub">A organização vai liberar teu perfil já já.</p>
-    <button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button><button class="link-btn" onclick="doLogout()">Sair</button>`;
+    <button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button>
+    <a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a>
+    <button class="link-btn" onclick="doLogout()">Sair</button>`;
 }
 function showRejected(){
   $('#nav').classList.add('hidden');const s=$('#screen');s.className='empty';
-  s.innerHTML=`<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização.</p><button class="link-btn" onclick="doLogout()">Sair</button>`;
+  s.innerHTML=`<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização.</p>
+    <a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a>
+    <button class="link-btn" onclick="doLogout()">Sair</button>`;
 }
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;if(me.status==='pending')toast('Ainda em análise…');render()}
 async function doLogout(){if(chatSub)chatSub.unsubscribe();await sb.auth.signOut();me=null;showLogin()}

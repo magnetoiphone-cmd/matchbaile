@@ -9,6 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="og-image.png">
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 
 <!-- Preview WhatsApp / Instagram / Redes Sociais -->
 <meta property="og:type" content="website">
@@ -55,13 +56,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--tinder1);box-shadow:0
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239a948d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 select option{background:var(--card);color:var(--txt)}
 textarea{resize:none;height:80px}
-.btn{width:100%;border:none;border-radius:14px;padding:14px;margin-top:16px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:var(--grad);color:#fff;box-shadow:0 4px 20px rgba(253,38,122,.35);transition:transform .15s cubic-bezier(.4,0,.2,1),box-shadow .15s}
+.btn{width:100%;border:none;border-radius:14px;padding:14px;margin-top:16px;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;background:var(--grad);color:#fff;box-shadow:0 4px 20px rgba(253,38,122,.35);transition:transform .15s cubic-bezier(.4,0,.2,1),box-shadow .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn svg{flex-shrink:0}
 .btn:hover{box-shadow:0 6px 28px rgba(253,38,122,.5)}
 .btn:active{transform:scale(.96)}
 .btn:disabled{opacity:.5;box-shadow:none;transform:none}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);box-shadow:none}
 .btn.sm{padding:10px 16px;font-size:14px;width:auto;margin-top:10px}
-.link-btn{background:none;border:none;color:var(--neon-amber);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;text-decoration:underline;transition:opacity .15s}
+.link-btn{background:none;border:none;color:var(--neon-amber);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;text-decoration:underline;transition:opacity .15s;display:inline-flex;align-items:center;gap:5px}
 .link-btn:active{opacity:.6}
 .ticket-cta{display:block;text-align:center;margin:16px 0;padding:14px;border-radius:14px;border:2px solid var(--neon-amber);color:var(--neon-amber);font-family:inherit;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 0 16px rgba(255,176,43,.3);transition:transform .15s,box-shadow .15s}
 .ticket-cta:active{transform:scale(.97)}
@@ -139,6 +141,7 @@ textarea{resize:none;height:80px}
 @keyframes pulse2{0%,100%{box-shadow:0 0 0 0 rgba(253,38,122,.5)}50%{box-shadow:0 0 0 6px rgba(253,38,122,0)}}
 .row.super-row{border-color:var(--super);box-shadow:0 0 12px rgba(168,85,247,.2)}
 .mini{width:40px;height:40px;border-radius:50%;border:2px solid;background:transparent;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+.mini svg{pointer-events:none}
 .mini:active{transform:scale(.8)}
 .mini.ok{color:var(--neon-green);border-color:var(--neon-green)}
 .mini.no{color:var(--tinder1);border-color:var(--tinder1)}
@@ -189,8 +192,10 @@ textarea{resize:none;height:80px}
 
 /* ---- nav ---- */
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:4px;background:rgba(5,5,5,.96);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-nav button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:11px;padding:6px 10px;border-radius:18px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+nav button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:11px;padding:6px 10px;border-radius:18px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:4px}
+nav button svg{flex-shrink:0}
 nav button.on{background:var(--card);color:var(--tinder2);box-shadow:0 0 12px rgba(255,96,54,.25);transform:scale(1.05)}
+nav button.on svg{stroke:var(--tinder2)}
 
 /* ---- ranking / podium ---- */
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:20px 0 24px;height:260px}
@@ -221,6 +226,23 @@ nav button.on{background:var(--card);color:var(--tinder2);box-shadow:0 0 12px rg
 .rank-likes{font-size:14px;font-weight:800;color:var(--tinder2);display:flex;align-items:center;gap:4px}
 .rank-likes .heart{color:var(--tinder1);font-size:16px;animation:pulse 1.5s infinite}
 .my-rank{border-color:var(--tinder2);box-shadow:0 0 12px rgba(255,96,54,.2)}
+
+/* ---- admin extras ---- */
+.admin-profile-detail{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;animation:fadeUp .3s ease}
+.admin-photos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0}
+.admin-photos img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;cursor:pointer;transition:transform .15s}
+.admin-photos img:active{transform:scale(.95)}
+.admin-msg-group{margin-bottom:16px;animation:fadeUp .3s ease both}
+.admin-msg-pair{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.admin-msg-pair img{width:36px;height:36px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+.admin-msg-pair b{font-size:13px}
+.admin-msg-pair .arrow{color:var(--tinder2);font-size:16px}
+.admin-msg-bubble{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:4px;margin-left:44px;font-size:13px;line-height:1.4}
+.admin-msg-bubble.has-img img{max-width:200px;border-radius:10px;cursor:pointer}
+.admin-msg-bubble .meta{font-size:10px;color:var(--dim);margin-top:4px}
+.admin-tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
+.admin-tabs::-webkit-scrollbar{display:none}
+.admin-tabs button{white-space:nowrap}
 .badge{background:var(--grad);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:3px}
 
 .toast{position:fixed;top:16px;left:50%;z-index:60;background:var(--card);border:1px solid var(--tinder1);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(253,38,122,.35);max-width:90%;text-align:center;animation:toastIn .4s cubic-bezier(.34,1.56,.64,1),toastOut .3s ease 2.7s forwards;transform:translateX(-50%)}
@@ -265,7 +287,94 @@ function cleanIG(v){return v.replace(/^@/,'').replace(/[^a-zA-Z0-9._]/g,'').toLo
 function getPhotos(p){const a=p.photos&&p.photos.length?p.photos:[];return a.length?a:p.photo_url?[p.photo_url]:[]}
 function timeAgo(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return'agora';if(s<3600)return Math.floor(s/60)+'min';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d'}
 function traduzir(msg){const m={'Invalid login credentials':'Usuário ou senha incorretos.','User already registered':'Esse @ já está cadastrado!','Password should be at least 6 characters':'Senha: mínimo 6 caracteres.','Unable to validate email address: invalid format':'Instagram inválido.','Email rate limit exceeded':'Muitas tentativas. Espere um pouco.','new row violates row-level security policy':'Erro de permissão.'};for(const[en,pt] of Object.entries(m)){if(msg.includes(en))return pt}return msg}
-function spawnConfetti(){const w=document.createElement('div');w.className='confetti-wrap';document.body.appendChild(w);const colors=['#fd267a','#ff6036','#ff8c00','#2bff6f','#a855f7','#fff'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.width=(4+Math.random()*6)+'px';c.style.height=(4+Math.random()*6)+'px';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';w.appendChild(c)}setTimeout(()=>w.remove(),5000)}
+
+/* Converte imagem para WebP otimizado */
+function toWebP(file,maxW=1200,quality=0.82){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
+      c.toBlob(blob=>{
+        if(blob)resolve(blob);
+        else reject(new Error('Erro ao converter imagem.'));
+      },'image/webp',quality);
+    };
+    img.onerror=()=>reject(new Error('Erro ao carregar imagem.'));
+    img.src=URL.createObjectURL(file);
+  });
+}
+function spawnConfetti(){const w=document.createElement('div');
+
+/* Lucide icon helper */
+function ic(name,size=20,sw=2){
+  const icons={
+    'heart':'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3.332.834-4.5 2.143C10.832 3.834 9.26 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z',
+    'x':'M18 6 6 18M6 6l12 12',
+    'star':'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+    'undo-2':'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11',
+    'camera':'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+    'mic':'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3',
+    'send':'M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zM21.854 2.147l-10.94 10.939',
+    'arrow-left':'M12 19l-7-7 7-7M19 12H5',
+    'plus':'M5 12h14M12 5v14',
+    'ticket':'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2ZM13 5v2M13 17v2M13 11v2',
+    'shield':'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+    'ban':'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
+    'check':'M20 6 9 17l-5-5',
+    'user':'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+    'message-circle':'M7.9 20A9 9 0 1 0 4 16.1L2 22Z',
+    'trophy':'M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z',
+    'flame':'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
+    'pencil':'M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5ZM15 5l4 4',
+    'play':'M6 3l14 9-14 9V3z',
+    'pause':'M6 4h4v16H6zM14 4h4v16h-4z',
+    'image':'M3 3h18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21',
+    'log-out':'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
+    'eye':'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    'users':'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+    'clipboard-list':'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M12 11h4M12 16h4M8 11h.01M8 16h.01M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z',
+    'chevron-down':'M6 9l6 6 6-6'
+  };
+  const d=icons[name]||'';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${d.split('M').filter(Boolean).map(p=>'M'+p).map(p=>{
+    if(p.includes('a ')&&p.includes(' 0 '))return `<path d="${p}"/>`;
+    return `<path d="${p}"/>`;
+  }).join('')}</svg>`;
+}
+/* simpler icon approach - just path */
+function ic2(name,size=20,sw=2){
+  const i={
+    'heart':`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3.332.834-4.5 2.143C10.832 3.834 9.26 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`,
+    'x':`<path d="M18 6 6 18"/><path d="m6 6 12 12"/>`,
+    'star':`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`,
+    'undo-2':`<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>`,
+    'camera':`<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>`,
+    'mic':`<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>`,
+    'send':`<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="M21.854 2.147l-10.94 10.939"/>`,
+    'arrow-left':`<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>`,
+    'plus':`<path d="M5 12h14"/><path d="M12 5v14"/>`,
+    'ticket':`<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>`,
+    'shield':`<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>`,
+    'ban':`<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>`,
+    'check':`<path d="M20 6 9 17l-5-5"/>`,
+    'user':`<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
+    'message-circle':`<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>`,
+    'trophy':`<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>`,
+    'flame':`<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>`,
+    'pencil':`<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>`,
+    'play':`<polygon points="6 3 20 12 6 21 6 3"/>`,
+    'pause':`<rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/>`,
+    'image-plus':`<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>`,
+    'log-out':`<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`,
+    'eye':`<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>`,
+    'users':`<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
+    'clipboard':`<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>`
+  };
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${i[name]||''}</svg>`;
+}w.className='confetti-wrap';document.body.appendChild(w);const colors=['#fd267a','#ff6036','#ff8c00','#2bff6f','#a855f7','#fff'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.width=(4+Math.random()*6)+'px';c.style.height=(4+Math.random()*6)+'px';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';w.appendChild(c)}setTimeout(()=>w.remove(),5000)}
 
 /* ============ BOOT ============ */
 async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}render()}
@@ -279,9 +388,9 @@ async function doRegister(){const u=cleanIG($('#r-user').value),p=$('#r-pass').v
 /* ============ PROFILE SETUP ============ */
 let setupPhotos=[],ticketFile=null;
 function showProfileSetup(ig){$('#nav').classList.add('hidden');setupPhotos=[];ticketFile=null;const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Entra na pista 🔥</h2><p class="sub">Monta teu perfil com até 6 fotos.</p><div class="photo-grid" id="pgrid"></div><input type="file" id="pfile" accept="image/*" class="hidden" multiple><label>Nome</label><input id="f-name" maxlength="40" placeholder="Como te chamam na pista"><label>Idade</label><input id="f-age" type="number" min="18" max="99" placeholder="18+"><label>Instagram</label><input id="f-ig" maxlength="40" placeholder="@seu_perfil" value="${esc(ig||'')}"><label>Gênero</label><select id="f-gender"><option value="">Selecione</option><option value="homem">Homem</option><option value="mulher">Mulher</option><option value="outro">Outro</option></select><label>Quero ver</label><select id="f-pref"><option value="todos">Todos</option><option value="homens">Homens</option><option value="mulheres">Mulheres</option></select><label>Bio</label><textarea id="f-bio" maxlength="160" placeholder="Fala algo que faça alguém arrastar pra direita"></textarea><label>Print do ingresso 🎟</label><button class="btn ghost" id="t-pick" style="margin-top:0">Anexar print do ingresso</button><input type="file" id="t-file" accept="image/*" class="hidden"><p class="sub" style="margin:6px 0 0;font-size:12px">Só a organização vê o ingresso.</p><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a><button class="btn" id="f-go">Enviar pra aprovação</button>`;renderPhotoGrid();$('#pfile').onchange=e=>{for(const f of e.target.files){if(setupPhotos.length<6)setupPhotos.push({file:f,url:URL.createObjectURL(f)})}renderPhotoGrid()};$('#t-pick').onclick=()=>$('#t-file').click();$('#t-file').onchange=e=>{ticketFile=e.target.files[0];if(ticketFile){$('#t-pick').textContent='🎟 '+ticketFile.name+' ✓';$('#t-pick').style.borderColor='var(--neon-green)';$('#t-pick').style.color='var(--neon-green)'}};$('#f-go').onclick=submitProfile}
-function renderPhotoGrid(){const g=$('#pgrid');let h='';for(let i=0;i<6;i++){const p=setupPhotos[i];const c=i===0?'photo-slot main':'photo-slot';if(p)h+=`<div class="${c}"><img src="${p.url}"><div class="remove" onclick="removeSetupPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#pfile').click()">+</div>`}g.innerHTML=h}
+function renderPhotoGrid(){const g=$('#pgrid');let h='';for(let i=0;i<6;i++){const p=setupPhotos[i];const c=i===0?'photo-slot main':'photo-slot';if(p)h+=`<div class="${c}"><img src="${p.url}"><div class="remove" onclick="removeSetupPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#pfile').click()">${ic2('plus',28,1.5)}</div>`}g.innerHTML=h}
 function removeSetupPhoto(i){setupPhotos.splice(i,1);renderPhotoGrid()}
-async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}if(!ticketFile){toast('Anexa o print do ingresso! 🎟');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const ext=(p.file.name.split('.').pop()||'jpg').toLowerCase();const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,p.file);if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const te=(ticketFile.name.split('.').pop()||'jpg').toLowerCase();const tp=`${user.id}/ingresso-${Date.now()}.${te}`;const{error:ue}=await sb.storage.from('ingressos').upload(tp,ticketFile);if(ue)throw ue;const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,ticket_path:tp,status:'approved'}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Enviar pra aprovação'}}
+async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}if(!ticketFile){toast('Anexa o print do ingresso! 🎟');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const webp=await toWebP(p.file);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const tWebp=await toWebP(ticketFile,1600,0.85);const tp=`${user.id}/ingresso-${Date.now()}.webp`;const{error:ue}=await sb.storage.from('ingressos').upload(tp,tWebp,{contentType:'image/webp'});if(ue)throw ue;const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,ticket_path:tp,status:'approved'}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Enviar pra aprovação'}}
 
 /* ============ RENDER ============ */
 function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
@@ -289,13 +398,13 @@ function showBanned(){$('#nav').classList.add('hidden');const s=$('#screen');s.c
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;render()}
 async function doLogout(){if(chatSub)chatSub.unsubscribe();await sb.auth.signOut();me=null;showLogin()}
 
-function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">🔥 Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">💬 Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">🏆 Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">👤 Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">🛡<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
+function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">${ic2('flame',16)} Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">${ic2('message-circle',16)} Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">${ic2('trophy',16)} Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">${ic2('user',16)} Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">${ic2('shield',16)}<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
 
 /* ============ SWIPE ============ */
 async function showSwipe(){const s=$('#screen');s.className='screen-enter';let banner='';if(!me.visible)banner=`<div style="background:var(--card);border:1px solid var(--neon-amber);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--neon-amber);text-align:center;animation:fadeUp .4s ease">⏳ Seu perfil ainda não está visível pra outros. A organização vai liberar em breve!</div>`;s.innerHTML=banner+`<div class="empty"><div class="big pulse">🔥</div></div>`;const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');const lmArr=[...likedMe];filtered.sort((a,b)=>{const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;if(aL!==bL)return bL-aL;return Math.random()-.5});deck=filtered;renderDeck()}
 let cardPhotoIdx=0;
-function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">↩</button><button class="act no" onclick="swipe('nope')">✖</button><button class="act superl" onclick="swipe('super')">⭐</button><button class="act yes" onclick="swipe('like')">♥</button></div>`;attachDrag($('#card'))}
+function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
 function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);cardPhotoIdx=Math.max(0,Math.min(photos.length-1,cardPhotoIdx+dir));const img=$('#card-img');if(img){img.style.opacity=0;setTimeout(()=>{img.src=photos[cardPhotoIdx];img.style.opacity=1},150)}document.querySelectorAll('#card .photo-dots span').forEach((d,i)=>d.className=i===cardPhotoIdx?'on':'')}
 function attachDrag(card){let sx=0,sy=0,dx=0,dy=0,dragging=false;const ls=card.querySelector('.stamp.like'),ns=card.querySelector('.stamp.nope'),ss=card.querySelector('.stamp.super'),sb2=card.querySelector('.super-badge');card.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition='none'});card.addEventListener('pointermove',e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translateX(${dx}px) translateY(${Math.min(0,dy*.4)}px) rotate(${dx/20}deg)`;ls.style.opacity=Math.max(0,dx/90);ns.style.opacity=Math.max(0,-dx/90);const so=Math.max(0,-dy/120);ss.style.opacity=so;sb2.style.opacity=so;sb2.style.transform=`translate(-50%,-50%) scale(${so})`});const end=()=>{if(!dragging)return;dragging=false;if(dx>110)swipe('like');else if(dx<-110)swipe('nope');else if(dy<-130)swipe('super');else{card.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';card.style.transform='';ls.style.opacity=0;ns.style.opacity=0;ss.style.opacity=0;sb2.style.opacity=0;sb2.style.transform='translate(-50%,-50%) scale(0)'}dx=0;dy=0};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)}
 async function swipe(type){const p=deck.shift();lastSwiped={profile:p,type};const card=$('#card');if(card){card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s';if(type==='like')card.style.transform='translateX(500px) rotate(25deg)';else if(type==='nope')card.style.transform='translateX(-500px) rotate(-25deg)';else card.style.transform='translateY(-600px) scale(.8)';card.style.opacity='0'}if(type==='like'||type==='super'){const{error}=await sb.from('likes').insert({liker:me.id,liked:p.id,is_super:type==='super'});if(!error&&likedMe.has(p.id))showMatchOv(p);else if(type==='super'&&!error)toast('Super Like enviado! ⭐')}setTimeout(renderDeck,350)}
@@ -307,12 +416,12 @@ async function showMatches(){const s=$('#screen');s.className='screen-enter';s.i
 
 /* ============ CHAT ============ */
 let currentChatId=null;
-async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const s=$('#screen');s.className='screen-enter';s.style.display='flex';s.style.flexDirection='column';s.innerHTML=`<div class="chat-header"><button class="back" onclick="closeChat()">←</button><img src="${esc(getPhotos(other)[0]||other.photo_url)}"><b>${esc(other.name)}</b></div><div class="chat-msgs" id="chatmsgs"></div><div class="rec-indicator hidden" id="rec-ind">🔴 Gravando… <span id="rec-time">0:00</span></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">📷</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn mic" id="mic-btn">🎤</button><button class="cbtn send" onclick="sendMsg('${otherId}')">➤</button></div>`;$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);const micBtn=$('#mic-btn');micBtn.addEventListener('pointerdown',e=>{e.preventDefault();startRecording()});micBtn.addEventListener('pointerup',()=>stopRecording(otherId));micBtn.addEventListener('pointerleave',()=>{if(mediaRecorder&&mediaRecorder.state==='recording')stopRecording(otherId)});$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
+async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const s=$('#screen');s.className='screen-enter';s.style.display='flex';s.style.flexDirection='column';s.innerHTML=`<div class="chat-header"><button class="back" onclick="closeChat()">${ic2("arrow-left",22)}</button><img src="${esc(getPhotos(other)[0]||other.photo_url)}"><b>${esc(other.name)}</b></div><div class="chat-msgs" id="chatmsgs"></div><div class="rec-indicator hidden" id="rec-ind">🔴 Gravando… <span id="rec-time">0:00</span></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">${ic2('camera',18)}</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn mic" id="mic-btn">${ic2("mic",18)}</button><button class="cbtn send" onclick="sendMsg('${otherId}')">${ic2('send',18)}</button></div>`;$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);const micBtn=$('#mic-btn');micBtn.addEventListener('pointerdown',e=>{e.preventDefault();startRecording()});micBtn.addEventListener('pointerup',()=>stopRecording(otherId));micBtn.addEventListener('pointerleave',()=>{if(mediaRecorder&&mediaRecorder.state==='recording')stopRecording(otherId)});$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
 function closeChat(){if(chatSub)chatSub.unsubscribe();chatSub=null;currentChatId=null;$('#screen').style='';tab='matches';render()}
 async function loadMessages(otherId){const{data}=await sb.from('messages').select('*').or(`and(sender.eq.${me.id},receiver.eq.${otherId}),and(sender.eq.${otherId},receiver.eq.${me.id})`).order('created_at',{ascending:true});const c=$('#chatmsgs');c.innerHTML='';(data||[]).forEach(m=>appendMsg(m,false));c.scrollTop=c.scrollHeight}
 function appendMsg(m,animate=true){const c=$('#chatmsgs');if(!c)return;const mine=m.sender===me.id;const t=new Date(m.created_at);const time=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');const div=document.createElement('div');div.className='msg '+(mine?'mine':'theirs');if(!animate)div.style.animation='none';let content='';if(m.content.startsWith('[img]')){const url=m.content.slice(5);content=`<img class="chat-img" src="${esc(url)}" onclick="viewImage('${esc(url)}')">`}else if(m.content.startsWith('[audio]')){const url=m.content.slice(7);const bars=Array.from({length:20},()=>`<span style="height:${4+Math.random()*20}px"></span>`).join('');content=`<div class="audio-player"><button onclick="playAudio(this,'${esc(url)}')">▶</button><div class="wave-bars">${bars}</div><span class="dur"></span></div>`}else{content=esc(m.content)}div.innerHTML=content+`<div class="msg-time">${time}</div>`;c.appendChild(div);c.scrollTop=c.scrollHeight}
 async function sendMsg(otherId){const inp=$('#chat-in');const txt=inp.value.trim();if(!txt)return;inp.value='';const{data,error}=await sb.from('messages').insert({sender:me.id,receiver:otherId,content:txt}).select().single();if(error){toast('Erro ao enviar.');return}appendMsg(data)}
-async function sendImage(otherId,e){const file=e.target.files[0];if(!file)return;toast('Enviando foto…');try{const{data:{user}}=await sb.auth.getUser();const ext=(file.name.split('.').pop()||'jpg').toLowerCase();const path=`chat/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,file);if(error)throw error;const url=sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;const{data:msg,error:me2}=await sb.from('messages').insert({sender:me.id,receiver:otherId,content:'[img]'+url}).select().single();if(me2)throw me2;appendMsg(msg)}catch(err){toast('Erro: '+err.message)}}
+async function sendImage(otherId,e){const file=e.target.files[0];if(!file)return;toast('Enviando foto…');try{const{data:{user}}=await sb.auth.getUser();const webp=await toWebP(file);const path=`chat/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error)throw error;const url=sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;const{data:msg,error:me2}=await sb.from('messages').insert({sender:me.id,receiver:otherId,content:'[img]'+url}).select().single();if(me2)throw me2;appendMsg(msg)}catch(err){toast('Erro: '+err.message)}}
 async function startRecording(){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);audioChunks=[];mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);mediaRecorder.start();recordStart=Date.now();$('#mic-btn').classList.add('recording');$('#rec-ind').classList.remove('hidden');recTimer=setInterval(()=>{const s=Math.floor((Date.now()-recordStart)/1000);$('#rec-time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},500)}catch(e){toast('Permita o acesso ao microfone.')}}
 async function stopRecording(otherId){if(!mediaRecorder||mediaRecorder.state!=='recording')return;$('#mic-btn').classList.remove('recording');$('#rec-ind').classList.add('hidden');clearInterval(recTimer);mediaRecorder.stop();mediaRecorder.stream.getTracks().forEach(t=>t.stop());mediaRecorder.onstop=async()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});if(blob.size<1000){toast('Áudio muito curto.');return}toast('Enviando áudio…');try{const{data:{user}}=await sb.auth.getUser();const path=`chat/${user.id}/audio-${Date.now()}.webm`;const{error}=await sb.storage.from('fotos').upload(path,blob,{contentType:'audio/webm'});if(error)throw error;const url=sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;const{data:msg,error:me2}=await sb.from('messages').insert({sender:me.id,receiver:otherId,content:'[audio]'+url}).select().single();if(me2)throw me2;appendMsg(msg)}catch(err){toast('Erro: '+err.message)}}}
 function playAudio(btn,url){const a=new Audio(url);const bars=btn.parentElement.querySelector('.wave-bars');const dur=btn.parentElement.querySelector('.dur');btn.textContent='⏸';a.play();a.ontimeupdate=()=>{const pct=a.currentTime/a.duration;const spans=bars.querySelectorAll('span');spans.forEach((s,i)=>{s.style.opacity=i/spans.length<=pct?'1':'.4'});dur.textContent=Math.floor(a.currentTime)+'s'};a.onended=()=>{btn.textContent='▶';bars.querySelectorAll('span').forEach(s=>s.style.opacity='.5')};btn.onclick=()=>{if(a.paused){a.play();btn.textContent='⏸'}else{a.pause();btn.textContent='▶'}}}
@@ -393,10 +502,10 @@ async function showRanking(){
 }
 
 /* ============ PERFIL ============ */
-function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">+ Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
-function renderEditPhotos(){const photos=getPhotos(me);const g=$('#ep-grid');let h='';for(let i=0;i<Math.max(photos.length,1);i++){const url=photos[i];const c=i===0?'photo-slot main':'photo-slot';if(url)h+=`<div class="${c}"><img src="${esc(url)}"><div class="remove" onclick="removeEditPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#ep-file').click()">+</div>`}if(photos.length<6&&photos.length>0)h+=`<div class="photo-slot" onclick="$('#ep-file').click()">+</div>`;g.innerHTML=h}
+function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">${ic2('image-plus',16)} Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">${ic2('log-out',16)} Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
+function renderEditPhotos(){const photos=getPhotos(me);const g=$('#ep-grid');let h='';for(let i=0;i<Math.max(photos.length,1);i++){const url=photos[i];const c=i===0?'photo-slot main':'photo-slot';if(url)h+=`<div class="${c}"><img src="${esc(url)}"><div class="remove" onclick="removeEditPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`}if(photos.length<6&&photos.length>0)h+=`<div class="photo-slot" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`;g.innerHTML=h}
 function removeEditPhoto(i){const photos=getPhotos(me);photos.splice(i,1);me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos()}
-async function addEditPhotos(e){const files=[...e.target.files];const photos=getPhotos(me);if(photos.length+files.length>6){toast('Máximo 6 fotos!');return}toast('Enviando fotos…');const{data:{user}}=await sb.auth.getUser();for(const f of files){const ext=(f.name.split('.').pop()||'jpg').toLowerCase();const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,f);if(error){toast('Erro: '+error.message);continue}photos.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos();toast('Fotos adicionadas! ✓')}
+async function addEditPhotos(e){const files=[...e.target.files];const photos=getPhotos(me);if(photos.length+files.length>6){toast('Máximo 6 fotos!');return}toast('Enviando fotos…');const{data:{user}}=await sb.auth.getUser();for(const f of files){const webp=await toWebP(f);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error){toast('Erro: '+error.message);continue}photos.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos();toast('Fotos adicionadas! ✓')}
 async function saveProfile(){const name=$('#e-name').value.trim(),age=parseInt($('#e-age').value);if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Idade inválida.');return}const updates={name,age,instagram:$('#e-ig').value.trim(),gender:$('#e-gender').value,preference:$('#e-pref').value,bio:$('#e-bio').value.trim(),photos:me.photos||[],photo_url:(me.photos&&me.photos[0])||me.photo_url};const{error}=await sb.from('profiles').update(updates).eq('id',me.id);if(error){toast(traduzir(error.message));return}Object.assign(me,updates);toast('Perfil salvo! ✓')}
 
 /* ============ ADMIN ============ */
@@ -404,27 +513,36 @@ let adminTab='pending';
 async function showAdmin(){
   const s=$('#screen');s.className='screen-enter';
   s.innerHTML=`<h2>Painel Admin 🛡</h2>
-    <div style="display:flex;gap:6px;margin-bottom:14px">
-      <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">📋 Aprovar</button>
-      <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">👥 Usuários</button>
+    <div class="admin-tabs">
+      <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">${ic2("clipboard",14)} Aprovar</button>
+      <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">${ic2("users",14)} Usuários</button>
+      <button class="btn sm ${adminTab==='msgs'?'':'ghost'}" onclick="adminTab='msgs';showAdmin()" style="flex:1">${ic2("message-circle",14)} Msgs</button>
     </div>
     <div id="admin-content"><p class="sub pulse">Carregando…</p></div>`;
   if(adminTab==='pending') loadAdminPending();
-  else loadAdminUsers();
+  else if(adminTab==='users') loadAdminUsers();
+  else loadAdminMsgs();
 }
 
 async function loadAdminPending(){
   const{data:pend}=await sb.from('profiles').select('*').eq('visible',false).eq('status','approved').order('created_at');
   const c=$('#admin-content');
   if(!pend||!pend.length){c.innerHTML=`<p class="sub">Nenhum perfil aguardando. Tudo em dia ✅</p>`;return}
-  c.innerHTML=`<p class="sub">${pend.length} perfil(is) aguardando liberação</p>`+pend.map(p=>`
-    <div class="row" id="row-${p.id}" style="cursor:default">
-      <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
-      <div class="rmain"><b>${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
-      <button class="mini" style="color:var(--neon-amber);border-color:var(--neon-amber)" onclick="viewTicket('${esc(p.ticket_path||'')}')">🎟</button>
-      <button class="mini no" onclick="rejectProfile('${p.id}')">✖</button>
-      <button class="mini ok" onclick="approveProfile('${p.id}')">✓</button>
-    </div>`).join('');
+  c.innerHTML=`<p class="sub">${pend.length} perfil(is) aguardando liberação</p>`+pend.map(p=>{
+    const photos=getPhotos(p);
+    return `<div class="admin-profile-detail" id="row-${p.id}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <img src="${esc(photos[0]||p.photo_url)}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;filter:grayscale(1)">
+        <div style="flex:1"><b>${esc(p.name)}, ${p.age||'?'}</b><br>${igLink(p.instagram)}<br><span style="color:var(--dim);font-size:12px">${esc(p.bio)}</span></div>
+      </div>
+      ${photos.length?`<label style="margin:0 0 6px">Fotos (${photos.length})</label><div class="admin-photos">${photos.map(u=>`<img src="${esc(u)}" onclick="viewImage('${esc(u)}')">`).join('')}</div>`:''}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn ghost sm" onclick="viewTicket('${esc(p.ticket_path||'')}')" style="flex:1">${ic2("ticket",14)} Ver ingresso</button>
+        <button class="btn ghost sm" onclick="rejectProfile('${p.id}')" style="flex:1;border-color:var(--tinder1);color:var(--tinder1)">${ic2("x",14)} Rejeitar</button>
+        <button class="btn sm" onclick="approveProfile('${p.id}')" style="flex:1">${ic2("check",14)} Liberar</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function loadAdminUsers(){
@@ -436,22 +554,86 @@ async function loadAdminUsers(){
   let h=`<p class="sub">${active.length} ativo(s) · ${banned.length} banido(s)</p>`;
   h+=active.map(p=>{
     const vis=p.visible?'🟢':'🔴';
-    return `<div class="row" id="urow-${p.id}" style="cursor:default">
-      <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
-      <div class="rmain"><b>${vis} ${esc(p.name)}, ${p.age||'?'}</b>${igLink(p.instagram)}<span>${esc(p.bio)}</span></div>
-      ${!p.visible?`<button class="mini ok" onclick="approveProfile('${p.id}')" title="Liberar">✓</button>`:''}
-      <button class="mini no" onclick="banUser('${p.id}','${esc(p.name)}')" title="Banir">🚫</button>
+    const photos=getPhotos(p);
+    return `<div class="admin-profile-detail" id="urow-${p.id}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <img src="${esc(photos[0]||p.photo_url)}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;filter:grayscale(1)">
+        <div style="flex:1"><b>${vis} ${esc(p.name)}, ${p.age||'?'}</b><br>${igLink(p.instagram)}<br><span style="color:var(--dim);font-size:12px">${esc(p.bio)}</span></div>
+      </div>
+      ${photos.length>1?`<div class="admin-photos">${photos.map(u=>`<img src="${esc(u)}" onclick="viewImage('${esc(u)}')">`).join('')}</div>`:''}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn ghost sm" onclick="viewTicket('${esc(p.ticket_path||'')}')" style="flex:1">${ic2("ticket",14)} Ingresso</button>
+        ${!p.visible?`<button class="btn sm" onclick="approveProfile('${p.id}')" style="flex:1">${ic2("check",14)} Liberar</button>`:''}
+        <button class="btn ghost sm" onclick="banUser('${p.id}','${esc(p.name)}')" style="flex:1;border-color:var(--tinder1);color:var(--tinder1)">${ic2("ban",14)} Banir</button>
+      </div>
     </div>`;
   }).join('');
   if(banned.length){
-    h+=`<label style="margin-top:14px">Banidos</label>`;
+    h+=`<label style="margin-top:14px">Banidos (${banned.length})</label>`;
     h+=banned.map(p=>`
       <div class="row" id="urow-${p.id}" style="cursor:default;opacity:.6">
         <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
         <div class="rmain"><b>🚫 ${esc(p.name)}</b>${igLink(p.instagram)}</div>
-        <button class="mini ok" onclick="unbanUser('${p.id}')" title="Desbanir">↩</button>
+        <button class="mini ok" onclick="unbanUser('${p.id}')" title="Desbanir">${ic2('undo-2',16)}</button>
       </div>`).join('');
   }
+  c.innerHTML=h;
+}
+
+async function loadAdminMsgs(){
+  const c=$('#admin-content');
+  // buscar últimas 100 mensagens
+  const{data:msgs}=await sb.from('messages').select('*').order('created_at',{ascending:false}).limit(500);
+  if(!msgs||!msgs.length){c.innerHTML=`<p class="sub">Nenhuma mensagem ainda.</p>`;return}
+  // buscar todos os perfis envolvidos
+  const uids=[...new Set(msgs.flatMap(m=>[m.sender,m.receiver]))];
+  const{data:profs}=await sb.from('profiles').select('*').in('id',uids);
+  const pm={};(profs||[]).forEach(p=>pm[p.id]=p);
+  // agrupar por par de conversa
+  const convos={};
+  msgs.forEach(m=>{
+    const pair=[m.sender,m.receiver].sort().join('|');
+    if(!convos[pair])convos[pair]={users:[m.sender,m.receiver],msgs:[]};
+    convos[pair].msgs.push(m);
+  });
+  let h=`<p class="sub">${msgs.length} mensagens · ${Object.keys(convos).length} conversas</p>`;
+  Object.values(convos).forEach(conv=>{
+    const u1=pm[conv.users[0]];const u2=pm[conv.users[1]];
+    if(!u1||!u2)return;
+    h+=`<div class="admin-msg-group">
+      <div class="admin-msg-pair">
+        <img src="${esc(getPhotos(u1)[0]||u1.photo_url)}">
+        <b>${esc(u1.name)}</b>
+        <span class="arrow">↔</span>
+        <b>${esc(u2.name)}</b>
+        <img src="${esc(getPhotos(u2)[0]||u2.photo_url)}">
+        <span style="color:var(--dim);font-size:11px;margin-left:auto">${conv.msgs.length} msg</span>
+      </div>`;
+    // mostrar TODAS as mensagens da conversa
+    const allMsgs=conv.msgs.slice().reverse();
+    allMsgs.forEach(m=>{
+      const sender=pm[m.sender];
+      const t=new Date(m.created_at);
+      const day=t.getDate().toString().padStart(2,'0')+'/'+(t.getMonth()+1).toString().padStart(2,'0');
+      const time=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+      let content='';
+      if(m.content.startsWith('[img]')){
+        const url=m.content.slice(5);
+        content=`<div class="has-img"><img src="${esc(url)}" onclick="viewImage('${esc(url)}')"></div>`;
+      }else if(m.content.startsWith('[audio]')){
+        const url=m.content.slice(7);
+        content='🎤 <i>Áudio</i> <audio controls src="'+esc(url)+'" style="height:28px;margin-top:4px;display:block"></audio>';
+      }else{
+        content=esc(m.content);
+      }
+      h+=`<div class="admin-msg-bubble">
+        <b style="color:var(--neon-amber);font-size:12px">${esc(sender?sender.name:'?')}</b>
+        <div>${content}</div>
+        <div class="meta">${day} ${time}</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  });
   c.innerHTML=h;
 }
 

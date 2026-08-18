@@ -187,8 +187,38 @@ textarea{resize:none;height:80px}
 
 /* ---- nav ---- */
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:4px;background:rgba(5,5,5,.96);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-nav button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:12px;padding:6px 12px;border-radius:18px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+nav button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:11px;padding:6px 10px;border-radius:18px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
 nav button.on{background:var(--card);color:var(--tinder2);box-shadow:0 0 12px rgba(255,96,54,.25);transform:scale(1.05)}
+
+/* ---- ranking / podium ---- */
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:20px 0 24px;height:260px}
+.pod{display:flex;flex-direction:column;align-items:center;animation:podRise .6s cubic-bezier(.34,1.56,.64,1) both}
+.pod:nth-child(1){animation-delay:.3s}
+.pod:nth-child(2){animation-delay:.1s}
+.pod:nth-child(3){animation-delay:.5s}
+@keyframes podRise{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+.pod img{border-radius:50%;object-fit:cover;filter:grayscale(1);border:3px solid var(--line);margin-bottom:6px;transition:transform .2s}
+.pod .crown{font-size:28px;margin-bottom:2px;animation:crownBounce 1s ease infinite}
+@keyframes crownBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.pod .pod-name{font-weight:800;font-size:14px;text-align:center;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .pod-likes{font-size:12px;color:var(--tinder2);font-weight:700;margin-top:2px}
+.pod .pod-bar{width:80px;border-radius:12px 12px 0 0;margin-top:8px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-weight:900;font-size:28px;color:rgba(255,255,255,.3)}
+.pod.p1 img{width:90px;height:90px;border-color:var(--neon-amber);box-shadow:0 0 20px rgba(255,176,43,.4)}
+.pod.p1 .pod-bar{height:120px;background:linear-gradient(180deg,var(--neon-amber),#b8860b);box-shadow:0 0 20px rgba(255,176,43,.3)}
+.pod.p2 img{width:74px;height:74px;border-color:#c0c0c0;box-shadow:0 0 14px rgba(192,192,192,.3)}
+.pod.p2 .pod-bar{height:90px;background:linear-gradient(180deg,#c0c0c0,#808080)}
+.pod.p3 img{width:66px;height:66px;border-color:#cd7f32;box-shadow:0 0 14px rgba(205,127,50,.3)}
+.pod.p3 .pod-bar{height:66px;background:linear-gradient(180deg,#cd7f32,#8b4513)}
+.rank-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;animation:fadeUp .35s ease both}
+.rank-row:nth-child(2){animation-delay:.05s}.rank-row:nth-child(3){animation-delay:.1s}
+.rank-pos{width:28px;font-weight:900;font-size:18px;text-align:center;color:var(--dim)}
+.rank-row img{width:48px;height:48px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+.rank-row .rmain{flex:1;min-width:0}
+.rank-row .rmain b{display:block;font-size:15px}
+.rank-row .rmain span{color:var(--dim);font-size:13px}
+.rank-likes{font-size:14px;font-weight:800;color:var(--tinder2);display:flex;align-items:center;gap:4px}
+.rank-likes .heart{color:var(--tinder1);font-size:16px;animation:pulse 1.5s infinite}
+.my-rank{border-color:var(--tinder2);box-shadow:0 0 12px rgba(255,96,54,.2)}
 .badge{background:var(--grad);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:3px}
 
 .toast{position:fixed;top:16px;left:50%;z-index:60;background:var(--card);border:1px solid var(--tinder1);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(253,38,122,.35);max-width:90%;text-align:center;animation:toastIn .4s cubic-bezier(.34,1.56,.64,1),toastOut .3s ease 2.7s forwards;transform:translateX(-50%)}
@@ -252,13 +282,13 @@ function removeSetupPhoto(i){setupPhotos.splice(i,1);renderPhotoGrid()}
 async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}if(!ticketFile){toast('Anexa o print do ingresso! 🎟');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const ext=(p.file.name.split('.').pop()||'jpg').toLowerCase();const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;const{error}=await sb.storage.from('fotos').upload(path,p.file);if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const te=(ticketFile.name.split('.').pop()||'jpg').toLowerCase();const tp=`${user.id}/ingresso-${Date.now()}.${te}`;const{error:ue}=await sb.storage.from('ingressos').upload(tp,ticketFile);if(ue)throw ue;const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,ticket_path:tp}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Enviar pra aprovação'}}
 
 /* ============ RENDER ============ */
-function render(){if(!me){showLogin();return}if(me.status==='pending'){showWaiting();return}if(me.status==='rejected'){showRejected();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
+function render(){if(!me){showLogin();return}if(me.status==='pending'){showWaiting();return}if(me.status==='rejected'){showRejected();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
 function showWaiting(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big pulse">🕐</div><h2>Aguardando aprovação</h2><p class="sub">A organização vai liberar teu perfil já já.</p><button class="btn ghost" style="max-width:220px" onclick="recheck()">Verificar de novo</button><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a><button class="link-btn" onclick="doLogout()">Sair</button>`}
 function showRejected(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">💔</div><h2>Perfil não aprovado</h2><p class="sub">Fala com a organização.</p><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta" style="max-width:280px"><span>🎟</span> Compre seu ingresso</a><button class="link-btn" onclick="doLogout()">Sair</button>`}
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;if(me.status==='pending')toast('Ainda em análise…');render()}
 async function doLogout(){if(chatSub)chatSub.unsubscribe();await sb.auth.signOut();me=null;showLogin()}
 
-function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">🔥 Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">💬 Chat</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">👤 Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">🛡<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
+function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">🔥 Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">💬 Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">🏆 Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">👤 Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">🛡<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('status','pending');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
 
 /* ============ SWIPE ============ */
@@ -286,6 +316,80 @@ async function startRecording(){try{const stream=await navigator.mediaDevices.ge
 async function stopRecording(otherId){if(!mediaRecorder||mediaRecorder.state!=='recording')return;$('#mic-btn').classList.remove('recording');$('#rec-ind').classList.add('hidden');clearInterval(recTimer);mediaRecorder.stop();mediaRecorder.stream.getTracks().forEach(t=>t.stop());mediaRecorder.onstop=async()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});if(blob.size<1000){toast('Áudio muito curto.');return}toast('Enviando áudio…');try{const{data:{user}}=await sb.auth.getUser();const path=`chat/${user.id}/audio-${Date.now()}.webm`;const{error}=await sb.storage.from('fotos').upload(path,blob,{contentType:'audio/webm'});if(error)throw error;const url=sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;const{data:msg,error:me2}=await sb.from('messages').insert({sender:me.id,receiver:otherId,content:'[audio]'+url}).select().single();if(me2)throw me2;appendMsg(msg)}catch(err){toast('Erro: '+err.message)}}}
 function playAudio(btn,url){const a=new Audio(url);const bars=btn.parentElement.querySelector('.wave-bars');const dur=btn.parentElement.querySelector('.dur');btn.textContent='⏸';a.play();a.ontimeupdate=()=>{const pct=a.currentTime/a.duration;const spans=bars.querySelectorAll('span');spans.forEach((s,i)=>{s.style.opacity=i/spans.length<=pct?'1':'.4'});dur.textContent=Math.floor(a.currentTime)+'s'};a.onended=()=>{btn.textContent='▶';bars.querySelectorAll('span').forEach(s=>s.style.opacity='.5')};btn.onclick=()=>{if(a.paused){a.play();btn.textContent='⏸'}else{a.pause();btn.textContent='▶'}}}
 function viewImage(url){const v=document.createElement('div');v.className='img-viewer';v.onclick=()=>v.remove();v.innerHTML=`<img src="${url}">`;document.body.appendChild(v)}
+
+/* ============ RANKING ============ */
+async function showRanking(){
+  const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="empty"><div class="big pulse">🏆</div></div>`;
+  // busca todos os likes e perfis aprovados
+  const[likesRes,profsRes]=await Promise.all([
+    sb.from('likes').select('liked,is_super'),
+    sb.from('profiles').select('*').eq('status','approved')
+  ]);
+  const likes=likesRes.data||[];
+  const profs=profsRes.data||[];
+  const profMap={};profs.forEach(p=>profMap[p.id]=p);
+  // contar likes por pessoa (super like = 3 pontos, like normal = 1)
+  const scores={};
+  likes.forEach(l=>{
+    if(!profMap[l.liked])return;
+    if(!scores[l.liked])scores[l.liked]=0;
+    scores[l.liked]+= l.is_super ? 3 : 1;
+  });
+  // ordenar
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(ranked.length===0){s.className='empty screen-enter';s.innerHTML=`<div class="big">🏆</div><h2>Ranking</h2><p class="sub">Ainda não tem likes suficientes.<br>Bora arrastar! 🔥</p>`;return}
+  let h=`<h2>🏆 Mais desejados da festa</h2>`;
+  // pódio top 3
+  const top3=ranked.slice(0,3);
+  if(top3.length>=2){
+    const order=top3.length===3?[1,0,2]:[1,0]; // 2º, 1º, 3º
+    h+=`<div class="podium">`;
+    order.forEach(i=>{
+      if(!top3[i])return;
+      const[id,pts]=top3[i];const p=profMap[id];if(!p)return;
+      const pos=i+1;const cls=`pod p${pos}`;
+      const medal=pos===1?'👑':pos===2?'🥈':'🥉';
+      const isMe=id===me.id?' (você!)':'';
+      h+=`<div class="${cls}">
+        ${pos===1?'<div class="crown">👑</div>':''}
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <div class="pod-name">${esc(p.name)}${isMe}</div>
+        <div class="pod-likes">♥ ${pts} pts</div>
+        <div class="pod-bar">${pos}º</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  // lista 4º-10º
+  const rest=ranked.slice(3);
+  if(rest.length){
+    h+=`<label>Ranking completo</label>`;
+    rest.forEach(([id,pts],i)=>{
+      const p=profMap[id];if(!p)return;
+      const pos=i+4;
+      const isMe=id===me.id?'my-rank':'';
+      h+=`<div class="rank-row ${isMe}">
+        <div class="rank-pos">${pos}º</div>
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <div class="rmain"><b>${esc(p.name)}${id===me.id?' (você!)':''}</b><span>${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</span></div>
+        <div class="rank-likes"><span class="heart">♥</span> ${pts}</div>
+      </div>`;
+    });
+  }
+  // minha posição se não tô no top 10
+  const myPos=ranked.findIndex(([id])=>id===me.id);
+  if(myPos===-1){
+    const myPts=scores[me.id]||0;
+    const totalAbove=Object.values(scores).filter(s=>s>myPts).length;
+    h+=`<div class="rank-row my-rank" style="margin-top:16px">
+      <div class="rank-pos">${totalAbove+1}º</div>
+      <img src="${esc(getPhotos(me)[0]||me.photo_url)}">
+      <div class="rmain"><b>${esc(me.name)} (você!)</b><span>Sua posição no ranking</span></div>
+      <div class="rank-likes"><span class="heart">♥</span> ${myPts}</div>
+    </div>`;
+  }
+  s.innerHTML=h;
+}
 
 /* ============ PERFIL ============ */
 function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">+ Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}

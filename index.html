@@ -306,45 +306,7 @@ function toWebP(file,maxW=1200,quality=0.82){
     img.src=URL.createObjectURL(file);
   });
 }
-function spawnConfetti(){const w=document.createElement('div');
-
 /* Lucide icon helper */
-function ic(name,size=20,sw=2){
-  const icons={
-    'heart':'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3.332.834-4.5 2.143C10.832 3.834 9.26 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z',
-    'x':'M18 6 6 18M6 6l12 12',
-    'star':'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
-    'undo-2':'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11',
-    'camera':'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
-    'mic':'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3',
-    'send':'M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zM21.854 2.147l-10.94 10.939',
-    'arrow-left':'M12 19l-7-7 7-7M19 12H5',
-    'plus':'M5 12h14M12 5v14',
-    'ticket':'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2ZM13 5v2M13 17v2M13 11v2',
-    'shield':'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
-    'ban':'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
-    'check':'M20 6 9 17l-5-5',
-    'user':'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
-    'message-circle':'M7.9 20A9 9 0 1 0 4 16.1L2 22Z',
-    'trophy':'M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z',
-    'flame':'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
-    'pencil':'M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5ZM15 5l4 4',
-    'play':'M6 3l14 9-14 9V3z',
-    'pause':'M6 4h4v16H6zM14 4h4v16h-4z',
-    'image':'M3 3h18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21',
-    'log-out':'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
-    'eye':'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
-    'users':'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    'clipboard-list':'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M12 11h4M12 16h4M8 11h.01M8 16h.01M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z',
-    'chevron-down':'M6 9l6 6 6-6'
-  };
-  const d=icons[name]||'';
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${d.split('M').filter(Boolean).map(p=>'M'+p).map(p=>{
-    if(p.includes('a ')&&p.includes(' 0 '))return `<path d="${p}"/>`;
-    return `<path d="${p}"/>`;
-  }).join('')}</svg>`;
-}
-/* simpler icon approach - just path */
 function ic2(name,size=20,sw=2){
   const i={
     'heart':`<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3.332.834-4.5 2.143C10.832 3.834 9.26 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`,
@@ -374,7 +336,9 @@ function ic2(name,size=20,sw=2){
     'clipboard':`<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>`
   };
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${i[name]||''}</svg>`;
-}w.className='confetti-wrap';document.body.appendChild(w);const colors=['#fd267a','#ff6036','#ff8c00','#2bff6f','#a855f7','#fff'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.width=(4+Math.random()*6)+'px';c.style.height=(4+Math.random()*6)+'px';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';w.appendChild(c)}setTimeout(()=>w.remove(),5000)}
+}
+
+function spawnConfetti(){const w=document.createElement('div');w.className='confetti-wrap';document.body.appendChild(w);const colors=['#fd267a','#ff6036','#ff8c00','#2bff6f','#a855f7','#fff'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.width=(4+Math.random()*6)+'px';c.style.height=(4+Math.random()*6)+'px';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';w.appendChild(c)}setTimeout(()=>w.remove(),5000)}
 
 /* ============ BOOT ============ */
 async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}render()}

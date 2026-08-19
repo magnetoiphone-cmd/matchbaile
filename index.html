@@ -86,6 +86,8 @@ textarea{resize:none;height:80px}
 @keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .pcard .photo-wrap{position:relative;width:100%;height:100%}
 .pcard .photo-wrap img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15);pointer-events:none;transition:opacity .25s ease}
+.row img,.like-bubble img,.pod img,.admin-photos img,.match-ov .pair img,.chat-header img{loading:lazy}
+img[loading=lazy]{content-visibility:auto}
 .pcard .photo-dots{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:3px;z-index:2}
 .pcard .photo-dots span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);transition:background .2s}
 .pcard .photo-dots span.on{background:#fff}
@@ -289,7 +291,7 @@ function timeAgo(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)re
 function traduzir(msg){const m={'Invalid login credentials':'Usuário ou senha incorretos.','User already registered':'Esse @ já está cadastrado!','Password should be at least 6 characters':'Senha: mínimo 6 caracteres.','Unable to validate email address: invalid format':'Instagram inválido.','Email rate limit exceeded':'Muitas tentativas. Espere um pouco.','new row violates row-level security policy':'Erro de permissão.'};for(const[en,pt] of Object.entries(m)){if(msg.includes(en))return pt}return msg}
 
 /* Converte imagem para WebP otimizado */
-function toWebP(file,maxW=1200,quality=0.82){
+function toWebP(file,maxW=900,quality=0.72){
   return new Promise((resolve,reject)=>{
     const img=new Image();
     img.onload=()=>{
@@ -373,10 +375,10 @@ function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);ca
 function attachDrag(card){let sx=0,sy=0,dx=0,dy=0,dragging=false;const ls=card.querySelector('.stamp.like'),ns=card.querySelector('.stamp.nope'),ss=card.querySelector('.stamp.super'),sb2=card.querySelector('.super-badge');card.addEventListener('pointerdown',e=>{if(e.target.classList.contains('photo-nav'))return;dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition='none'});card.addEventListener('pointermove',e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translateX(${dx}px) translateY(${Math.min(0,dy*.4)}px) rotate(${dx/20}deg)`;ls.style.opacity=Math.max(0,dx/90);ns.style.opacity=Math.max(0,-dx/90);const so=Math.max(0,-dy/120);ss.style.opacity=so;sb2.style.opacity=so;sb2.style.transform=`translate(-50%,-50%) scale(${so})`});const end=()=>{if(!dragging)return;dragging=false;if(dx>110)swipe('like');else if(dx<-110)swipe('nope');else if(dy<-130)swipe('super');else{card.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';card.style.transform='';ls.style.opacity=0;ns.style.opacity=0;ss.style.opacity=0;sb2.style.opacity=0;sb2.style.transform='translate(-50%,-50%) scale(0)'}dx=0;dy=0};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)}
 async function swipe(type){const p=deck.shift();lastSwiped={profile:p,type};const card=$('#card');if(card){card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s';if(type==='like')card.style.transform='translateX(500px) rotate(25deg)';else if(type==='nope')card.style.transform='translateX(-500px) rotate(-25deg)';else card.style.transform='translateY(-600px) scale(.8)';card.style.opacity='0'}if(type==='like'||type==='super'){const{error}=await sb.from('likes').insert({liker:me.id,liked:p.id,is_super:type==='super'});if(!error&&likedMe.has(p.id))showMatchOv(p);else if(type==='super'&&!error)toast('Super Like enviado! ⭐')}setTimeout(renderDeck,350)}
 async function undoSwipe(){if(!lastSwiped){toast('Nada pra desfazer.');return}const{profile,type}=lastSwiped;if(type==='like'||type==='super'){await sb.from('likes').delete().eq('liker',me.id).eq('liked',profile.id)}deck.unshift(profile);lastSwiped=null;renderDeck();toast('Desfeito! ↩')}
-function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h1>DEU<br>MATCH! 🔥</h1><div class="pair"><img src="${esc(getPhotos(me)[0]||me.photo_url)}"><img src="${esc(getPhotos(p)[0]||p.photo_url)}"></div><div style="animation:fadeUp .4s ease .5s both"><b style="font-size:18px">${esc(p.name)}</b></div><div class="ig" style="animation:fadeUp .4s ease .55s both">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div><button class="btn" style="max-width:220px" onclick="this.parentElement.remove();tab='matches';render()">Mandar mensagem</button><button class="btn ghost" style="max-width:220px" onclick="this.parentElement.remove()">Continuar na pista</button>`;document.body.appendChild(ov)}
+function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h1>DEU<br>MATCH! 🔥</h1><div class="pair"><img src="${esc(getPhotos(me)[0]||me.photo_url)}"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"></div><div style="animation:fadeUp .4s ease .5s both"><b style="font-size:18px">${esc(p.name)}</b></div><div class="ig" style="animation:fadeUp .4s ease .55s both">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div><button class="btn" style="max-width:220px" onclick="this.parentElement.remove();tab='matches';render()">Mandar mensagem</button><button class="btn ghost" style="max-width:220px" onclick="this.parentElement.remove()">Continuar na pista</button>`;document.body.appendChild(ov)}
 
 /* ============ MATCHES ============ */
-async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';if(last&&last.content.startsWith('[audio]'))preview='🎤 Áudio';h+=`<div class="row" onclick="openChat('${id}')"><img src="${esc(getPhotos(p)[0]||p.photo_url)}"><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
+async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';if(last&&last.content.startsWith('[audio]'))preview='🎤 Áudio';h+=`<div class="row" onclick="openChat('${id}')"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
 
 /* ============ CHAT ============ */
 let currentChatId=null;
@@ -394,39 +396,28 @@ function viewImage(url){const v=document.createElement('div');v.className='img-v
 /* ============ RANKING ============ */
 async function showRanking(){
   const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="empty"><div class="big pulse">🏆</div></div>`;
-  // busca todos os likes e perfis aprovados
-  const[likesRes,profsRes]=await Promise.all([
-    sb.from('likes').select('liked,is_super'),
+  const[rankRes,profsRes]=await Promise.all([
+    sb.rpc('get_ranking'),
     sb.from('profiles').select('*').eq('status','approved').eq('visible',true)
   ]);
-  const likes=likesRes.data||[];
+  const ranking=rankRes.data||[];
   const profs=profsRes.data||[];
   const profMap={};profs.forEach(p=>profMap[p.id]=p);
-  // contar likes por pessoa (super like = 3 pontos, like normal = 1)
-  const scores={};
-  likes.forEach(l=>{
-    if(!profMap[l.liked])return;
-    if(!scores[l.liked])scores[l.liked]=0;
-    scores[l.liked]+= l.is_super ? 3 : 1;
-  });
-  // ordenar
-  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ranked=ranking.filter(r=>profMap[r.profile_id]).map(r=>[r.profile_id,Number(r.points)]);
   if(ranked.length===0){s.className='empty screen-enter';s.innerHTML=`<div class="big">🏆</div><h2>Ranking</h2><p class="sub">Ainda não tem likes suficientes.<br>Bora arrastar! 🔥</p>`;return}
   let h=`<h2>🏆 Mais desejados da festa</h2>`;
-  // pódio top 3
   const top3=ranked.slice(0,3);
   if(top3.length>=2){
-    const order=top3.length===3?[1,0,2]:[1,0]; // 2º, 1º, 3º
+    const order=top3.length===3?[1,0,2]:[1,0];
     h+=`<div class="podium">`;
     order.forEach(i=>{
       if(!top3[i])return;
       const[id,pts]=top3[i];const p=profMap[id];if(!p)return;
       const pos=i+1;const cls=`pod p${pos}`;
-      const medal=pos===1?'👑':pos===2?'🥈':'🥉';
       const isMe=id===me.id?' (você!)':'';
       h+=`<div class="${cls}">
         ${pos===1?'<div class="crown">👑</div>':''}
-        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">
         <div class="pod-name">${esc(p.name)}${isMe}</div>
         <div class="pod-likes">♥ ${pts} pts</div>
         <div class="pod-bar">${pos}º</div>
@@ -434,7 +425,6 @@ async function showRanking(){
     });
     h+=`</div>`;
   }
-  // lista 4º-10º
   const rest=ranked.slice(3);
   if(rest.length){
     h+=`<label>Ranking completo</label>`;
@@ -444,17 +434,17 @@ async function showRanking(){
       const isMe=id===me.id?'my-rank':'';
       h+=`<div class="rank-row ${isMe}">
         <div class="rank-pos">${pos}º</div>
-        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">
         <div class="rmain"><b>${esc(p.name)}${id===me.id?' (você!)':''}</b><span>${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</span></div>
         <div class="rank-likes"><span class="heart">♥</span> ${pts}</div>
       </div>`;
     });
   }
-  // minha posição se não tô no top 10
   const myPos=ranked.findIndex(([id])=>id===me.id);
   if(myPos===-1){
-    const myPts=scores[me.id]||0;
-    const totalAbove=Object.values(scores).filter(s=>s>myPts).length;
+    const myEntry=ranking.find(r=>r.profile_id===me.id);
+    const myPts=myEntry?Number(myEntry.points):0;
+    const totalAbove=ranked.filter(([,p])=>p>myPts).length;
     h+=`<div class="rank-row my-rank" style="margin-top:16px">
       <div class="rank-pos">${totalAbove+1}º</div>
       <img src="${esc(getPhotos(me)[0]||me.photo_url)}">
@@ -467,7 +457,7 @@ async function showRanking(){
 
 /* ============ PERFIL ============ */
 function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">${ic2('image-plus',16)} Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">${ic2('log-out',16)} Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
-function renderEditPhotos(){const photos=getPhotos(me);const g=$('#ep-grid');let h='';for(let i=0;i<Math.max(photos.length,1);i++){const url=photos[i];const c=i===0?'photo-slot main':'photo-slot';if(url)h+=`<div class="${c}"><img src="${esc(url)}"><div class="remove" onclick="removeEditPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`}if(photos.length<6&&photos.length>0)h+=`<div class="photo-slot" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`;g.innerHTML=h}
+function renderEditPhotos(){const photos=getPhotos(me);const g=$('#ep-grid');let h='';for(let i=0;i<Math.max(photos.length,1);i++){const url=photos[i];const c=i===0?'photo-slot main':'photo-slot';if(url)h+=`<div class="${c}"><img src="${esc(url)}" loading="lazy"><div class="remove" onclick="removeEditPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`}if(photos.length<6&&photos.length>0)h+=`<div class="photo-slot" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`;g.innerHTML=h}
 function removeEditPhoto(i){const photos=getPhotos(me);photos.splice(i,1);me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos()}
 async function addEditPhotos(e){const files=[...e.target.files];const photos=getPhotos(me);if(photos.length+files.length>6){toast('Máximo 6 fotos!');return}toast('Enviando fotos…');const{data:{user}}=await sb.auth.getUser();for(const f of files){const webp=await toWebP(f);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error){toast('Erro: '+error.message);continue}photos.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos();toast('Fotos adicionadas! ✓')}
 async function saveProfile(){const name=$('#e-name').value.trim(),age=parseInt($('#e-age').value);if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Idade inválida.');return}const updates={name,age,instagram:$('#e-ig').value.trim(),gender:$('#e-gender').value,preference:$('#e-pref').value,bio:$('#e-bio').value.trim(),photos:me.photos||[],photo_url:(me.photos&&me.photos[0])||me.photo_url};const{error}=await sb.from('profiles').update(updates).eq('id',me.id);if(error){toast(traduzir(error.message));return}Object.assign(me,updates);toast('Perfil salvo! ✓')}
@@ -536,7 +526,7 @@ async function loadAdminUsers(){
     h+=`<label style="margin-top:14px">Banidos (${banned.length})</label>`;
     h+=banned.map(p=>`
       <div class="row" id="urow-${p.id}" style="cursor:default;opacity:.6">
-        <img src="${esc(getPhotos(p)[0]||p.photo_url)}">
+        <img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">
         <div class="rmain"><b>🚫 ${esc(p.name)}</b>${igLink(p.instagram)}</div>
         <button class="mini ok" onclick="unbanUser('${p.id}')" title="Desbanir">${ic2('undo-2',16)}</button>
       </div>`).join('');
@@ -583,7 +573,7 @@ async function loadAdminMsgs(){
       let content='';
       if(m.content.startsWith('[img]')){
         const url=m.content.slice(5);
-        content=`<div class="has-img"><img src="${esc(url)}" onclick="viewImage('${esc(url)}')"></div>`;
+        content=`<div class="has-img"><img src="${esc(url)}" loading="lazy" onclick="viewImage('${esc(url)}')"></div>`;
       }else if(m.content.startsWith('[audio]')){
         const url=m.content.slice(7);
         content='🎤 <i>Áudio</i> <audio controls src="'+esc(url)+'" style="height:28px;margin-top:4px;display:block"></audio>';

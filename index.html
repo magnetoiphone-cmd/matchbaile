@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Tinder Match 🔥</title>
+<title>Tokyo Match 🔥</title>
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
@@ -13,17 +13,17 @@
 
 <!-- Preview WhatsApp / Instagram / Redes Sociais -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Tinder Match 🔥">
+<meta property="og:title" content="Tokyo Match 🔥">
 <meta property="og:description" content="Dê match antes da festa começar! Crie seu perfil e encontre seu par na pista.">
 <meta property="og:image" content="https://matchbaile.vercel.app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://matchbaile.vercel.app">
-<meta property="og:site_name" content="Tinder Match">
+<meta property="og:site_name" content="Tokyo Match">
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Tinder Match 🔥">
+<meta name="twitter:title" content="Tokyo Match 🔥">
 <meta name="twitter:description" content="Dê match antes da festa começar! Crie seu perfil e encontre seu par na pista.">
 <meta name="twitter:image" content="https://matchbaile.vercel.app/og-image.png">
 
@@ -70,6 +70,29 @@ textarea{resize:none;height:80px}
 .ticket-cta span{font-size:18px}
 .flyer{width:100%;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:fadeUp .5s ease}
 .flyer img{width:100%;display:block}
+
+/* ---- check-in bar ---- */
+.checkin-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;margin-bottom:12px;animation:fadeUp .4s ease}
+.checkin-bar.off{background:var(--card);border:1px solid var(--line)}
+.checkin-bar.on{background:linear-gradient(135deg,rgba(43,255,111,.12),rgba(43,255,111,.05));border:1px solid var(--neon-green);box-shadow:0 0 16px rgba(43,255,111,.15)}
+.checkin-bar .ci-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.checkin-bar.off .ci-dot{background:var(--dim)}
+.checkin-bar.on .ci-dot{background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);animation:pulse2 1.5s infinite}
+.checkin-bar .ci-text{flex:1;font-size:13px;font-weight:600}
+.checkin-bar.on .ci-text{color:var(--neon-green)}
+.checkin-bar .ci-btn{padding:8px 16px;border-radius:10px;border:none;font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:transform .15s}
+.checkin-bar .ci-btn:active{transform:scale(.92)}
+.checkin-bar.off .ci-btn{background:var(--neon-green);color:#000}
+.checkin-bar.on .ci-btn{background:transparent;border:1px solid var(--neon-green);color:var(--neon-green)}
+.checkin-count{text-align:center;font-size:12px;color:var(--dim);margin-bottom:10px;animation:fadeUp .4s ease .1s both}
+.checkin-count b{color:var(--neon-green)}
+.filter-bar{display:flex;gap:6px;margin-bottom:12px;animation:fadeUp .35s ease}
+.filter-bar button{flex:1;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--dim);font-family:inherit;font-weight:600;font-size:12px;cursor:pointer;transition:all .15s}
+.filter-bar button.active{border-color:var(--neon-green);color:var(--neon-green);background:rgba(43,255,111,.08);box-shadow:0 0 10px rgba(43,255,111,.15)}
+.online-dot{position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;background:var(--neon-green);border:2px solid var(--bg);box-shadow:0 0 6px var(--neon-green);animation:pulse2 1.5s infinite}
+.row .img-wrap,.pcard .img-wrap{position:relative;flex-shrink:0}
+.row .img-wrap img{width:52px;height:52px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+.row .img-wrap .online-dot{width:10px;height:10px;bottom:0;right:0}
 
 /* ---- photo grid ---- */
 .photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
@@ -236,6 +259,13 @@ nav button.on svg{stroke:var(--tinder2)}
 .admin-tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
 .admin-tabs::-webkit-scrollbar{display:none}
 .admin-tabs button{white-space:nowrap}
+.event-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:10px;animation:fadeUp .3s ease}
+.event-card.active{border-color:var(--neon-green);box-shadow:0 0 14px rgba(43,255,111,.15)}
+.event-card h3{font-size:16px;font-weight:800;margin-bottom:4px}
+.event-card .ev-meta{color:var(--dim);font-size:13px;margin-bottom:10px}
+.event-card .ev-badge{display:inline-block;padding:2px 10px;border-radius:8px;font-size:11px;font-weight:700}
+.event-card .ev-badge.on{background:rgba(43,255,111,.15);color:var(--neon-green)}
+.event-card .ev-badge.off{background:rgba(154,148,141,.15);color:var(--dim)}
 .badge{background:var(--grad);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:3px}
 
 .toast{position:fixed;top:16px;left:50%;z-index:60;background:var(--card);border:1px solid var(--tinder1);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(253,38,122,.35);max-width:90%;text-align:center;animation:toastIn .4s cubic-bezier(.34,1.56,.64,1),toastOut .3s ease 2.7s forwards;transform:translateX(-50%)}
@@ -257,7 +287,7 @@ nav button.on svg{stroke:var(--tinder2)}
 </head>
 <body>
 <div class="wrap" id="app">
-  <div class="logo"><span class="fire">🔥</span><div class="l1">TINDER</div><div class="l2">MATCH</div></div>
+  <div class="logo"><span class="fire">🔥</span><div class="l1">TOKYO</div><div class="l2">MATCH</div></div>
   <div class="logo-bar"></div>
   <div id="screen" class="empty"><div class="big pulse">🔥</div><p>Carregando…</p></div>
 </div>
@@ -325,7 +355,8 @@ function ic2(name,size=20,sw=2){
     'log-out':`<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`,
     'eye':`<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>`,
     'users':`<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
-    'clipboard':`<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>`
+    'clipboard':`<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>`,
+    'map-pin':`<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`
   };
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${i[name]||''}</svg>`;
 }
@@ -336,9 +367,9 @@ function spawnConfetti(){const w=document.createElement('div');w.className='conf
 async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}render()}
 
 /* ============ LOGIN ============ */
-function showLogin(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tinder Match - Essa Sexta"></div><h2>Entrar 🔥</h2><p class="sub">Faz login com teu @ do Instagram.</p><label>@ do Instagram</label><input id="l-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha</label><input id="l-pass" type="password" maxlength="60" placeholder="Sua senha"><button class="btn" id="l-go">Entrar</button><div style="text-align:center"><button class="link-btn" id="l-reg">Não tem conta? Criar agora</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#l-go').onclick=doLogin;$('#l-reg').onclick=showRegister;$('#l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})}
+function showLogin(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tokyo Match - Essa Sexta"></div><h2>Entrar 🔥</h2><p class="sub">Faz login com teu @ do Instagram.</p><label>@ do Instagram</label><input id="l-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha</label><input id="l-pass" type="password" maxlength="60" placeholder="Sua senha"><button class="btn" id="l-go">Entrar</button><div style="text-align:center"><button class="link-btn" id="l-reg">Não tem conta? Criar agora</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#l-go').onclick=doLogin;$('#l-reg').onclick=showRegister;$('#l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})}
 async function doLogin(){const u=cleanIG($('#l-user').value),p=$('#l-pass').value;if(!u){toast('Coloca teu @!');return}if(!p){toast('Coloca tua senha!');return}const btn=$('#l-go');btn.disabled=true;btn.textContent='Entrando…';try{const{data,error}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});if(error)throw error;const{data:prof}=await sb.from('profiles').select('*').eq('id',data.user.id).maybeSingle();me=prof;if(!me){showProfileSetup(u);return}render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Entrar'}}
-function showRegister(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tinder Match - Essa Sexta"></div><h2>Criar conta 🔥</h2><p class="sub">Use seu @ do Instagram como login.</p><label>@ do Instagram</label><input id="r-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha (mínimo 6 caracteres)</label><input id="r-pass" type="password" maxlength="60" placeholder="Crie uma senha"><label>Confirmar senha</label><input id="r-pass2" type="password" maxlength="60" placeholder="Repita a senha"><button class="btn" id="r-go">Criar conta</button><div style="text-align:center"><button class="link-btn" id="r-back">Já tem conta? Entrar</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#r-go').onclick=doRegister;$('#r-back').onclick=showLogin}
+function showRegister(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tokyo Match - Essa Sexta"></div><h2>Criar conta 🔥</h2><p class="sub">Use seu @ do Instagram como login.</p><label>@ do Instagram</label><input id="r-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha (mínimo 6 caracteres)</label><input id="r-pass" type="password" maxlength="60" placeholder="Crie uma senha"><label>Confirmar senha</label><input id="r-pass2" type="password" maxlength="60" placeholder="Repita a senha"><button class="btn" id="r-go">Criar conta</button><div style="text-align:center"><button class="link-btn" id="r-back">Já tem conta? Entrar</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#r-go').onclick=doRegister;$('#r-back').onclick=showLogin}
 async function doRegister(){const u=cleanIG($('#r-user').value),p=$('#r-pass').value,p2=$('#r-pass2').value;if(!u||u.length<2){toast('@ precisa ter pelo menos 2 caracteres.');return}if(!p||p.length<6){toast('Senha: mínimo 6 caracteres.');return}if(p!==p2){toast('As senhas não batem!');return}const btn=$('#r-go');btn.disabled=true;btn.textContent='Criando…';try{const{error}=await sb.auth.signUp({email:toEmail(u),password:p});if(error)throw error;const{error:le}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});if(le)throw le;showProfileSetup(u)}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Criar conta'}}
 
 /* ============ PROFILE SETUP ============ */
@@ -358,9 +389,94 @@ function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
 
 /* ============ SWIPE ============ */
-async function showSwipe(){const s=$('#screen');s.className='screen-enter';let banner='';if(!me.visible)banner=`<div style="background:var(--card);border:1px solid var(--neon-amber);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--neon-amber);text-align:center;animation:fadeUp .4s ease">⏳ Seu perfil ainda não está visível pra outros. A organização vai liberar em breve!</div>`;s.innerHTML=banner+`<div class="empty"><div class="big pulse">🔥</div></div>`;const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');const lmArr=[...likedMe];filtered.sort((a,b)=>{const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;if(aL!==bL)return bL-aL;return Math.random()-.5});deck=filtered;renderDeck()}
+let swipeFilter='todos';
+let activeEvent=null;
+
+async function loadActiveEvent(){
+  const{data}=await sb.from('events').select('*').eq('is_active',true).limit(1).maybeSingle();
+  activeEvent=data;
+}
+
+function getPartyStatus(){
+  if(!activeEvent) return {started:false, noEvent:true};
+  const start=new Date(activeEvent.date_time);
+  const now=new Date();
+  if(now>=start) return {started:true, event:activeEvent};
+  const diff=start-now;
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  const s=Math.floor((diff%60000)/1000);
+  let countdown='';
+  if(d>0) countdown=`${d}d ${h}h ${m}min`;
+  else if(h>0) countdown=`${h}h ${m}min`;
+  else countdown=`${m}min ${s}s`;
+  return {started:false, countdown, event:activeEvent};
+}
+
+async function showSwipe(){const s=$('#screen');s.className='screen-enter';
+  await loadActiveEvent();
+  const party=getPartyStatus();
+  let checkinHtml='';
+  if(party.noEvent){
+    checkinHtml=`<div class="checkin-bar off">
+      <div class="ci-dot"></div>
+      <div class="ci-text">Nenhuma festa agendada no momento</div>
+    </div>`;
+  }else if(!party.started){
+    checkinHtml=`<div class="checkin-bar off">
+      <div class="ci-dot"></div>
+      <div class="ci-text"><b>${esc(party.event.name)}</b> começa em <b style="color:var(--tinder2)">${party.countdown}</b></div>
+    </div>`;
+  }else{
+    const isHere=me.at_party||false;
+    const ciClass=isHere?'on':'off';
+    const ciText=isHere?`Você está na <b>${esc(party.event.name)}</b>! 🎉`:`Chegou na <b>${esc(party.event.name)}</b>?`;
+    const ciBtn=isHere?'Sair do check-in':'Fazer check-in';
+    checkinHtml=`<div class="checkin-bar ${ciClass}">
+      <div class="ci-dot"></div>
+      <div class="ci-text">${ciText}</div>
+      <button class="ci-btn" onclick="toggleCheckIn()">${ciBtn}</button>
+    </div>`;
+  }
+  let banner='';if(!me.visible)banner=`<div style="background:var(--card);border:1px solid var(--neon-amber);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:var(--neon-amber);text-align:center;animation:fadeUp .4s ease">⏳ Seu perfil ainda não está visível pra outros. A organização vai liberar em breve!</div>`;
+  s.innerHTML=banner+checkinHtml+`
+    <div id="party-count"></div>
+    ${party.started?`<div class="filter-bar">
+      <button class="${swipeFilter==='todos'?'active':''}" onclick="swipeFilter='todos';showSwipe()">Todos</button>
+      <button class="${swipeFilter==='festa'?'active':''}" onclick="swipeFilter='festa';showSwipe()">${ic2('map-pin',14)} Na festa agora</button>
+    </div>`:''}
+    <div class="empty"><div class="big pulse">🔥</div></div>`;
+  const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);
+  myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));
+  let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));
+  if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');
+  else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');
+  const atParty=(pr.data||[]).filter(p=>p.at_party).length+(me.at_party?1:0);
+  const pc=$('#party-count');if(pc&&party.started)pc.innerHTML=`<div class="checkin-count">${ic2('map-pin',12)} <b>${atParty}</b> pessoa${atParty!==1?'s':''} na festa agora</div>`;
+  // filter
+  if(swipeFilter==='festa')filtered=filtered.filter(p=>p.at_party);
+  // sort: at_party first, then who liked me
+  const lmArr=[...likedMe];
+  filtered.sort((a,b)=>{
+    const aP=a.at_party?1:0,bP=b.at_party?1:0;
+    if(aP!==bP)return bP-aP;
+    const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;
+    if(aL!==bL)return bL-aL;
+    return Math.random()-.5;
+  });
+  deck=filtered;renderDeck()}
+
+async function toggleCheckIn(){
+  const newVal=!me.at_party;
+  const{error}=await sb.from('profiles').update({at_party:newVal}).eq('id',me.id);
+  if(error){toast(traduzir(error.message));return}
+  me.at_party=newVal;
+  toast(newVal?'Check-in feito! 🎉':'Check-out feito.');
+  showSwipe();
+}
 let cardPhotoIdx=0;
-function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
+function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const partyTag=p.at_party?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''} ${partyTag}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
 function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);cardPhotoIdx=Math.max(0,Math.min(photos.length-1,cardPhotoIdx+dir));const img=$('#card-img');if(img){img.style.opacity=0;setTimeout(()=>{img.src=photos[cardPhotoIdx];img.style.opacity=1},150)}document.querySelectorAll('#card .photo-dots span').forEach((d,i)=>d.className=i===cardPhotoIdx?'on':'')}
 function attachDrag(card){let sx=0,sy=0,dx=0,dy=0,dragging=false;const ls=card.querySelector('.stamp.like'),ns=card.querySelector('.stamp.nope'),ss=card.querySelector('.stamp.super'),sb2=card.querySelector('.super-badge');card.addEventListener('pointerdown',e=>{if(e.target.classList.contains('photo-nav'))return;dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition='none'});card.addEventListener('pointermove',e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translateX(${dx}px) translateY(${Math.min(0,dy*.4)}px) rotate(${dx/20}deg)`;ls.style.opacity=Math.max(0,dx/90);ns.style.opacity=Math.max(0,-dx/90);const so=Math.max(0,-dy/120);ss.style.opacity=so;sb2.style.opacity=so;sb2.style.transform=`translate(-50%,-50%) scale(${so})`});const end=()=>{if(!dragging)return;dragging=false;if(dx>110)swipe('like');else if(dx<-110)swipe('nope');else if(dy<-130)swipe('super');else{card.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';card.style.transform='';ls.style.opacity=0;ns.style.opacity=0;ss.style.opacity=0;sb2.style.opacity=0;sb2.style.transform='translate(-50%,-50%) scale(0)'}dx=0;dy=0};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)}
 async function swipe(type){const p=deck.shift();lastSwiped={profile:p,type};const card=$('#card');if(card){card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s';if(type==='like')card.style.transform='translateX(500px) rotate(25deg)';else if(type==='nope')card.style.transform='translateX(-500px) rotate(-25deg)';else card.style.transform='translateY(-600px) scale(.8)';card.style.opacity='0'}if(type==='like'||type==='super'){const{error}=await sb.from('likes').insert({liker:me.id,liked:p.id,is_super:type==='super'});if(!error&&likedMe.has(p.id))showMatchOv(p);else if(type==='super'&&!error)toast('Super Like enviado! ⭐')}setTimeout(renderDeck,350)}
@@ -368,7 +484,7 @@ async function undoSwipe(){if(!lastSwiped){toast('Nada pra desfazer.');return}co
 function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h1>DEU<br>MATCH! 🔥</h1><div class="pair"><img src="${esc(getPhotos(me)[0]||me.photo_url)}"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"></div><div style="animation:fadeUp .4s ease .5s both"><b style="font-size:18px">${esc(p.name)}</b></div><div class="ig" style="animation:fadeUp .4s ease .55s both">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div><button class="btn" style="max-width:220px" onclick="this.parentElement.remove();tab='matches';render()">Mandar mensagem</button><button class="btn ghost" style="max-width:220px" onclick="this.parentElement.remove()">Continuar na pista</button>`;document.body.appendChild(ov)}
 
 /* ============ MATCHES ============ */
-async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';h+=`<div class="row" onclick="openChat('${id}')"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
+async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';const dot=p.at_party?'<div class="online-dot"></div>':'';h+=`<div class="row" onclick="openChat('${id}')"><div class="img-wrap"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
 
 /* ============ CHAT ============ */
 let currentChatId=null;
@@ -455,14 +571,99 @@ async function showAdmin(){
   const s=$('#screen');s.className='screen-enter';
   s.innerHTML=`<h2>Painel Admin 🛡</h2>
     <div class="admin-tabs">
+      <button class="btn sm ${adminTab==='events'?'':'ghost'}" onclick="adminTab='events';showAdmin()" style="flex:1">🎉 Festas</button>
       <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">${ic2("clipboard",14)} Aprovar</button>
       <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">${ic2("users",14)} Usuários</button>
       <button class="btn sm ${adminTab==='msgs'?'':'ghost'}" onclick="adminTab='msgs';showAdmin()" style="flex:1">${ic2("message-circle",14)} Msgs</button>
     </div>
     <div id="admin-content"><p class="sub pulse">Carregando…</p></div>`;
-  if(adminTab==='pending') loadAdminPending();
+  if(adminTab==='events') loadAdminEvents();
+  else if(adminTab==='pending') loadAdminPending();
   else if(adminTab==='users') loadAdminUsers();
   else loadAdminMsgs();
+}
+
+async function loadAdminEvents(){
+  const c=$('#admin-content');
+  const{data:events}=await sb.from('events').select('*').order('date_time',{ascending:false});
+  let h=`<button class="btn sm" onclick="showCreateEvent()" style="margin-bottom:14px">${ic2('plus',14)} Criar nova festa</button>`;
+  if(!events||!events.length){h+=`<p class="sub">Nenhuma festa criada ainda.</p>`;c.innerHTML=h;return}
+  h+=events.map(ev=>{
+    const d=new Date(ev.date_time);
+    const dateStr=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    const timeStr=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const now=new Date();
+    const isLive=ev.is_active&&now>=d;
+    const isFuture=ev.is_active&&now<d;
+    let badge='';
+    if(isLive) badge='<span class="ev-badge on">🟢 AO VIVO</span>';
+    else if(isFuture) badge='<span class="ev-badge on">Agendada</span>';
+    else badge='<span class="ev-badge off">Inativa</span>';
+    return `<div class="event-card ${ev.is_active?'active':''}">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div><h3>${esc(ev.name)}</h3><div class="ev-meta">${ic2('map-pin',12)} ${esc(ev.location||'Local não definido')} · ${dateStr} · ${timeStr}</div>${badge}</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        ${!ev.is_active?`<button class="btn sm" onclick="activateEvent('${ev.id}')" style="flex:1;background:var(--neon-green);color:#000">${ic2('check',14)} Ativar</button>`:`<button class="btn sm ghost" onclick="deactivateEvent('${ev.id}')" style="flex:1">${ic2('x',14)} Desativar</button>`}
+        <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1">${ic2('undo-2',14)} Resetar check-ins</button>
+        <button class="btn sm ghost" onclick="deleteEvent('${ev.id}','${esc(ev.name)}')" style="flex:1;border-color:var(--tinder1);color:var(--tinder1)">${ic2('x',14)} Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+  c.innerHTML=h;
+}
+
+function showCreateEvent(){
+  const c=$('#admin-content');
+  c.innerHTML=`
+    <h2>Nova festa</h2>
+    <label>Nome da festa</label><input id="ev-name" maxlength="60" placeholder="Ex: Tokyo Match Vol. 2">
+    <label>Data e hora</label><input id="ev-date" type="datetime-local">
+    <label>Local</label><input id="ev-location" maxlength="100" placeholder="Ex: Eskina Lounge">
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn ghost sm" onclick="loadAdminEvents()" style="flex:1">Cancelar</button>
+      <button class="btn sm" onclick="createEvent()" style="flex:1">${ic2('check',14)} Criar festa</button>
+    </div>`;
+}
+
+async function createEvent(){
+  const name=$('#ev-name').value.trim();
+  const dateVal=$('#ev-date').value;
+  const location=$('#ev-location').value.trim();
+  if(!name){toast('Dá um nome pra festa!');return}
+  if(!dateVal){toast('Escolhe a data e hora!');return}
+  const date_time=new Date(dateVal).toISOString();
+  const{error}=await sb.from('events').insert({name,date_time,location,is_active:false});
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Festa criada! 🎉');loadAdminEvents();
+}
+
+async function activateEvent(id){
+  // desativa todas primeiro, depois ativa a escolhida
+  await sb.from('events').update({is_active:false}).neq('id','00000000-0000-0000-0000-000000000000');
+  const{error}=await sb.from('events').update({is_active:true}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Festa ativada! 🎉');loadAdminEvents();
+}
+
+async function deactivateEvent(id){
+  const{error}=await sb.from('events').update({is_active:false}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Festa desativada.');loadAdminEvents();
+}
+
+async function deleteEvent(id,name){
+  if(!confirm(`Excluir a festa "${name}"?`))return;
+  const{error}=await sb.from('events').delete().eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Festa excluída.');loadAdminEvents();
+}
+
+async function resetCheckins(){
+  if(!confirm('Resetar todos os check-ins? Todos vão sair do modo "na festa".'))return;
+  const{error}=await sb.from('profiles').update({at_party:false}).neq('id','00000000-0000-0000-0000-000000000000');
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  me.at_party=false;toast('Check-ins resetados! ✓');
 }
 
 async function loadAdminPending(){

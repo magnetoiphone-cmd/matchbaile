@@ -620,8 +620,9 @@ async function showRanking(){
   }
   const myPos=ranked.findIndex(([id])=>id===me.id);
   if(myPos===-1){
-    const myEntry=ranking.find(r=>r.profile_id===me.id);
-    const myPts=myEntry?Number(myEntry.points):0;
+    // buscar meus pontos diretamente (fora do top 10)
+    const{data:myLikesData}=await sb.from('likes').select('is_super').eq('liked',me.id);
+    const myPts=(myLikesData||[]).reduce((sum,l)=>sum+(l.is_super?3:1),0);
     const totalAbove=ranked.filter(([,p])=>p>myPts).length;
     h+=`<div class="rank-row my-rank" style="margin-top:16px">
       <div class="rank-pos">${totalAbove+1}º</div>

@@ -880,7 +880,7 @@ async function loadAdminMsgs(){
 }
 
 async function approveProfile(id){
-  const{error}=await sb.from('profiles').update({visible:true}).eq('id',id);
+  const{error}=await sb.from('profiles').update({visible:true,status:'approved'}).eq('id',id);
   if(error){toast('Erro: '+traduzir(error.message));return}
   const row=$('#row-'+id)||$('#urow-'+id);
   if(row){row.style.transition='transform .3s,opacity .3s';row.style.transform='translateX(100%)';row.style.opacity='0';setTimeout(()=>row.remove(),300)}

@@ -93,6 +93,8 @@ textarea{resize:none;height:80px}
 .row .img-wrap,.pcard .img-wrap{position:relative;flex-shrink:0}
 .row .img-wrap img{width:52px;height:52px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
 .row .img-wrap .online-dot{width:10px;height:10px;bottom:0;right:0}
+.row .img-wrap.at-party img{border:2px solid var(--neon-green);box-shadow:0 0 10px rgba(43,255,111,.3)}
+.like-bubble.at-party img{border-color:var(--neon-green)!important;box-shadow:0 0 10px rgba(43,255,111,.3)}
 
 /* ---- photo grid ---- */
 .photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
@@ -106,6 +108,7 @@ textarea{resize:none;height:80px}
 /* ---- deck / swipe ---- */
 .deck{position:relative;flex:1;min-height:420px;margin-top:4px}
 .pcard{position:absolute;inset:0;border-radius:22px;overflow:hidden;background:var(--card);border:1px solid var(--line);touch-action:none;box-shadow:0 18px 50px rgba(0,0,0,.65);animation:cardIn .45s cubic-bezier(.34,1.56,.64,1)}
+.pcard.at-party{border:2px solid var(--neon-green);box-shadow:0 0 20px rgba(43,255,111,.25),0 18px 50px rgba(0,0,0,.65)}
 @keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .pcard .photo-wrap{position:relative;width:100%;height:100%}
 .pcard .photo-wrap img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15);pointer-events:none;transition:opacity .25s ease}
@@ -484,7 +487,7 @@ async function toggleCheckIn(){
   showSwipe();
 }
 let cardPhotoIdx=0;
-function renderDeck(){const da=$('#deck-area');if(!da)return;if(!deck.length){da.innerHTML=`<div class="empty"><div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button></div>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const partyTag=p.at_party?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';da.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''} ${partyTag}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
+function renderDeck(){const da=$('#deck-area');if(!da)return;if(!deck.length){da.innerHTML=`<div class="empty"><div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button></div>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const partyTag=p.at_party?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';const partyClass=p.at_party?' at-party':'';da.innerHTML=`<div class="deck"><div class="pcard${partyClass}" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''} ${partyTag}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
 function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);cardPhotoIdx=Math.max(0,Math.min(photos.length-1,cardPhotoIdx+dir));const img=$('#card-img');if(img){img.style.opacity=0;setTimeout(()=>{img.src=photos[cardPhotoIdx];img.style.opacity=1},150)}document.querySelectorAll('#card .photo-dots span').forEach((d,i)=>d.className=i===cardPhotoIdx?'on':'')}
 function attachDrag(card){let sx=0,sy=0,dx=0,dy=0,dragging=false;const ls=card.querySelector('.stamp.like'),ns=card.querySelector('.stamp.nope'),ss=card.querySelector('.stamp.super'),sb2=card.querySelector('.super-badge');card.addEventListener('pointerdown',e=>{if(e.target.classList.contains('photo-nav'))return;dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition='none'});card.addEventListener('pointermove',e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translateX(${dx}px) translateY(${Math.min(0,dy*.4)}px) rotate(${dx/20}deg)`;ls.style.opacity=Math.max(0,dx/90);ns.style.opacity=Math.max(0,-dx/90);const so=Math.max(0,-dy/120);ss.style.opacity=so;sb2.style.opacity=so;sb2.style.transform=`translate(-50%,-50%) scale(${so})`});const end=()=>{if(!dragging)return;dragging=false;if(dx>110)swipe('like');else if(dx<-110)swipe('nope');else if(dy<-130)swipe('super');else{card.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';card.style.transform='';ls.style.opacity=0;ns.style.opacity=0;ss.style.opacity=0;sb2.style.opacity=0;sb2.style.transform='translate(-50%,-50%) scale(0)'}dx=0;dy=0};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)}
 async function swipe(type){const p=deck.shift();lastSwiped={profile:p,type};const card=$('#card');if(card){card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s';if(type==='like')card.style.transform='translateX(500px) rotate(25deg)';else if(type==='nope')card.style.transform='translateX(-500px) rotate(-25deg)';else card.style.transform='translateY(-600px) scale(.8)';card.style.opacity='0'}if(type==='like'||type==='super'){const{error}=await sb.from('likes').insert({liker:me.id,liked:p.id,is_super:type==='super'});if(!error&&likedMe.has(p.id))showMatchOv(p);else if(type==='super'&&!error)toast('Super Like enviado! ⭐')}setTimeout(renderDeck,350)}
@@ -492,7 +495,7 @@ async function undoSwipe(){if(!lastSwiped){toast('Nada pra desfazer.');return}co
 function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h1>DEU<br>MATCH! 🔥</h1><div class="pair"><img src="${esc(getPhotos(me)[0]||me.photo_url)}"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"></div><div style="animation:fadeUp .4s ease .5s both"><b style="font-size:18px">${esc(p.name)}</b></div><div class="ig" style="animation:fadeUp .4s ease .55s both">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div><button class="btn" style="max-width:220px" onclick="this.parentElement.remove();tab='matches';render()">Mandar mensagem</button><button class="btn ghost" style="max-width:220px" onclick="this.parentElement.remove()">Continuar na pista</button>`;document.body.appendChild(ov)}
 
 /* ============ MATCHES ============ */
-async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';const dot=p.at_party?'<div class="online-dot"></div>':'';h+=`<div class="row" onclick="openChat('${id}')"><div class="img-wrap"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
+async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''} ${p.at_party?'at-party':''}" onclick="showSwipe()"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy"><p>${esc(p.name)}</p></div>`});h+=`</div>`}h+=`<label>Matches</label>`;const sorted=matchIds.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>{if(!a.lm&&!b.lm)return 0;if(!a.lm)return 1;if(!b.lm)return-1;return new Date(b.lm.created_at)-new Date(a.lm.created_at)});if(!sorted.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;sorted.forEach(({id,lm:last})=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=last?esc(last.content):'Diz oi! 👋';if(last&&last.content.startsWith('[img]'))preview='📷 Foto';const dot=p.at_party?'<div class="online-dot"></div>':'';const partyWrap=p.at_party?' at-party':'';h+=`<div class="row" onclick="openChat('${id}')"><div class="img-wrap${partyWrap}"><img src="${esc(getPhotos(p)[0]||p.photo_url)}" loading="lazy">${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div>`});mv.innerHTML=h}
 
 /* ============ CHAT ============ */
 let currentChatId=null;
@@ -612,8 +615,9 @@ async function loadAdminEvents(){
         <div><h3>${esc(ev.name)}</h3><div class="ev-meta">${ic2('map-pin',12)} ${esc(ev.location||'Local não definido')} · ${dateStr} · ${timeStr}</div>${badge}</div>
       </div>
       <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn sm ghost" onclick="showEditEvent('${ev.id}','${esc(ev.name)}','${ev.date_time}','${esc(ev.location||'')}')" style="flex:1">${ic2('pencil',14)} Editar</button>
         ${!ev.is_active?`<button class="btn sm" onclick="activateEvent('${ev.id}')" style="flex:1;background:var(--neon-green);color:#000">${ic2('check',14)} Ativar</button>`:`<button class="btn sm ghost" onclick="deactivateEvent('${ev.id}')" style="flex:1">${ic2('x',14)} Desativar</button>`}
-        <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1">${ic2('undo-2',14)} Resetar check-ins</button>
+        <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1">${ic2('undo-2',14)} Resetar</button>
         <button class="btn sm ghost" onclick="deleteEvent('${ev.id}','${esc(ev.name)}')" style="flex:1;border-color:var(--tinder1);color:var(--tinder1)">${ic2('x',14)} Excluir</button>
       </div>
     </div>`;
@@ -644,6 +648,33 @@ async function createNewEvent(){
   const{error}=await sb.from('events').insert({name,date_time,location,is_active:false});
   if(error){toast('Erro: '+traduzir(error.message));return}
   toast('Festa criada! 🎉');loadAdminEvents();
+}
+
+function showEditEvent(id,name,dateTime,location){
+  const c=$('#admin-content');
+  const d=new Date(dateTime);
+  const localDate=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  c.innerHTML=`
+    <h2>${ic2('pencil',18)} Editar festa</h2>
+    <label>Nome da festa</label><input id="ev-name" maxlength="60" value="${esc(name)}">
+    <label>Data e hora</label><input id="ev-date" type="datetime-local" value="${localDate}">
+    <label>Local</label><input id="ev-location" maxlength="100" value="${esc(location)}">
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn ghost sm" onclick="loadAdminEvents()" style="flex:1">Cancelar</button>
+      <button class="btn sm" onclick="saveEditEvent('${id}')" style="flex:1">${ic2('check',14)} Salvar</button>
+    </div>`;
+}
+
+async function saveEditEvent(id){
+  const name=$('#ev-name').value.trim();
+  const dateVal=$('#ev-date').value;
+  const location=$('#ev-location').value.trim();
+  if(!name){toast('Dá um nome pra festa!');return}
+  if(!dateVal){toast('Escolhe a data e hora!');return}
+  const date_time=new Date(dateVal).toISOString();
+  const{error}=await sb.from('events').update({name,date_time,location}).eq('id',id);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Festa atualizada! ✓');loadAdminEvents();
 }
 
 async function activateEvent(id){

@@ -387,14 +387,23 @@ function igLink(ig){return ig?`<a href="https://instagram.com/${encodeURICompone
 function toEmail(ig){return ig.toLowerCase().trim().replace('@','')+'@'+EMAIL_DOMAIN}
 function cleanIG(v){return v.replace(/^@/,'').replace(/[^a-zA-Z0-9._]/g,'').toLowerCase()}
 /* ---- Image optimization ---- */
-// Gera URL de thumbnail via Supabase Transform (funciona em planos pagos)
-// Em planos gratuitos, retorna a URL original
+// COLE AQUI a URL do seu Cloudflare Worker (depois de criar)
+// Ex: "https://tokyo-match-cdn.magno123.workers.dev"
+// Se deixar vazio, usa direto do Supabase (mais lento)
+const CDN_URL = "https://tokyo-match-cdn.magnetoiphone.workers.dev";
+
 function thumb(url,w=400){
   if(!url)return '';
   try{
     const u=new URL(url);
     if(u.pathname.includes('/storage/v1/object/public/')){
-      return url.replace('/storage/v1/object/public/',`/storage/v1/render/image/public/`)+'?width='+w+'&resize=contain&quality=70';
+      // Se tem CDN, usa o worker do Cloudflare
+      if(CDN_URL){
+        const path=u.pathname.split('/storage/v1/object/public/')[1];
+        return CDN_URL+'/img/'+path+'?w='+w;
+      }
+      // Senão tenta Supabase Transform (plano pago)
+      return url.replace('/storage/v1/object/public/','/storage/v1/render/image/public/')+'?width='+w+'&resize=contain&quality=70';
     }
   }catch(e){}
   return url;

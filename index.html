@@ -620,12 +620,11 @@ async function showRanking(){
   }
   const myPos=ranked.findIndex(([id])=>id===me.id);
   if(myPos===-1){
-    // buscar meus pontos diretamente (fora do top 10)
-    const{data:myLikesData}=await sb.from('likes').select('is_super').eq('liked',me.id);
-    const myPts=(myLikesData||[]).reduce((sum,l)=>sum+(l.is_super?3:1),0);
-    const totalAbove=ranked.filter(([,p])=>p>myPts).length;
+    const{data:myRankData}=await sb.rpc('get_user_rank',{user_id:me.id});
+    const myPts=myRankData&&myRankData[0]?Number(myRankData[0].points):0;
+    const myRank=myRankData&&myRankData[0]?Number(myRankData[0].rank):ranked.length+1;
     h+=`<div class="rank-row my-rank" style="margin-top:16px">
-      <div class="rank-pos">${totalAbove+1}º</div>
+      <div class="rank-pos">${myRank}º</div>
       <img src="${esc(getPhotos(me)[0]||me.photo_url)}">
       <div class="rmain"><b>${esc(me.name)} (você!)</b><span>Sua posição no ranking</span></div>
       <div class="rank-likes"><span class="heart">♥</span> ${myPts}</div>

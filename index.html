@@ -408,9 +408,10 @@ function getPartyStatus(){
   const m=Math.floor((diff%3600000)/60000);
   const s=Math.floor((diff%60000)/1000);
   let countdown='';
-  if(d>0) countdown=`${d}d ${h}h ${m}min`;
-  else if(h>0) countdown=`${h}h ${m}min`;
-  else countdown=`${m}min ${s}s`;
+  if(d>0) countdown=`${d}d ${h}h ${m}min ${s}s`;
+  else if(h>0) countdown=`${h}h ${m}min ${s}s`;
+  else if(m>0) countdown=`${m}min ${s}s`;
+  else countdown=`${s}s`;
   return {started:false, countdown, event:activeEvent};
 }
 
@@ -426,8 +427,15 @@ async function showSwipe(){const s=$('#screen');s.className='screen-enter';
   }else if(!party.started){
     checkinHtml=`<div class="checkin-bar off">
       <div class="ci-dot"></div>
-      <div class="ci-text"><b>${esc(party.event.name)}</b> começa em <b style="color:var(--tinder2)">${party.countdown}</b></div>
+      <div class="ci-text"><b>${esc(party.event.name)}</b> começa em <b style="color:var(--tinder2)" id="countdown">${party.countdown}</b></div>
     </div>`;
+    // atualizar countdown a cada segundo
+    if(window._countdownTimer) clearInterval(window._countdownTimer);
+    window._countdownTimer=setInterval(()=>{
+      const p2=getPartyStatus();
+      if(p2.started){clearInterval(window._countdownTimer);showSwipe();return}
+      const el=$('#countdown');if(el)el.textContent=p2.countdown;
+    },1000);
   }else{
     const isHere=me.at_party||false;
     const ciClass=isHere?'on':'off';
@@ -446,7 +454,7 @@ async function showSwipe(){const s=$('#screen');s.className='screen-enter';
       <button class="${swipeFilter==='todos'?'active':''}" onclick="swipeFilter='todos';showSwipe()">Todos</button>
       <button class="${swipeFilter==='festa'?'active':''}" onclick="swipeFilter='festa';showSwipe()">${ic2('map-pin',14)} Na festa agora</button>
     </div>`:''}
-    <div class="empty"><div class="big pulse">🔥</div></div>`;
+    <div id="deck-area"><div class="empty"><div class="big pulse">🔥</div></div></div>`;
   const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);
   myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));
   let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));
@@ -476,7 +484,7 @@ async function toggleCheckIn(){
   showSwipe();
 }
 let cardPhotoIdx=0;
-function renderDeck(){const s=$('#screen');if(!deck.length){s.className='empty screen-enter';s.innerHTML=`<div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const partyTag=p.at_party?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';s.className='';s.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''} ${partyTag}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
+function renderDeck(){const da=$('#deck-area');if(!da)return;if(!deck.length){da.innerHTML=`<div class="empty"><div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button></div>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const partyTag=p.at_party?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';da.innerHTML=`<div class="deck"><div class="pcard" id="card"><div class="photo-wrap"><div class="photo-dots">${photos.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('')}</div>${photos.length>1?`<div class="photo-nav left" onclick="navPhoto(-1)"></div><div class="photo-nav right" onclick="navPhoto(1)"></div>`:''}<img id="card-img" src="${esc(photos[0])}" alt=""></div><div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div><div class="stamp super">SUPER</div><div class="super-badge">⭐</div><div class="info"><h3>${esc(p.name)}, ${p.age||'?'}</h3><div class="ig">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div>${gl?`<span class="gender-tag">${gl}</span>`:''} ${partyTag}<p>${esc(p.bio)}</p></div></div></div><div class="actions"><button class="act undo" onclick="undoSwipe()" title="Desfazer">${ic2("undo-2",22)}</button><button class="act no" onclick="swipe('nope')">${ic2('x',26)}</button><button class="act superl" onclick="swipe('super')">${ic2('star',22)}</button><button class="act yes" onclick="swipe('like')">${ic2('heart',26)}</button></div>`;attachDrag($('#card'))}
 function navPhoto(dir){const p=deck[0];if(!p)return;const photos=getPhotos(p);cardPhotoIdx=Math.max(0,Math.min(photos.length-1,cardPhotoIdx+dir));const img=$('#card-img');if(img){img.style.opacity=0;setTimeout(()=>{img.src=photos[cardPhotoIdx];img.style.opacity=1},150)}document.querySelectorAll('#card .photo-dots span').forEach((d,i)=>d.className=i===cardPhotoIdx?'on':'')}
 function attachDrag(card){let sx=0,sy=0,dx=0,dy=0,dragging=false;const ls=card.querySelector('.stamp.like'),ns=card.querySelector('.stamp.nope'),ss=card.querySelector('.stamp.super'),sb2=card.querySelector('.super-badge');card.addEventListener('pointerdown',e=>{if(e.target.classList.contains('photo-nav'))return;dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.style.transition='none'});card.addEventListener('pointermove',e=>{if(!dragging)return;dx=e.clientX-sx;dy=e.clientY-sy;card.style.transform=`translateX(${dx}px) translateY(${Math.min(0,dy*.4)}px) rotate(${dx/20}deg)`;ls.style.opacity=Math.max(0,dx/90);ns.style.opacity=Math.max(0,-dx/90);const so=Math.max(0,-dy/120);ss.style.opacity=so;sb2.style.opacity=so;sb2.style.transform=`translate(-50%,-50%) scale(${so})`});const end=()=>{if(!dragging)return;dragging=false;if(dx>110)swipe('like');else if(dx<-110)swipe('nope');else if(dy<-130)swipe('super');else{card.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';card.style.transform='';ls.style.opacity=0;ns.style.opacity=0;ss.style.opacity=0;sb2.style.opacity=0;sb2.style.transform='translate(-50%,-50%) scale(0)'}dx=0;dy=0};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end)}
 async function swipe(type){const p=deck.shift();lastSwiped={profile:p,type};const card=$('#card');if(card){card.style.transition='transform .4s cubic-bezier(.4,0,.2,1), opacity .4s';if(type==='like')card.style.transform='translateX(500px) rotate(25deg)';else if(type==='nope')card.style.transform='translateX(-500px) rotate(-25deg)';else card.style.transform='translateY(-600px) scale(.8)';card.style.opacity='0'}if(type==='like'||type==='super'){const{error}=await sb.from('likes').insert({liker:me.id,liked:p.id,is_super:type==='super'});if(!error&&likedMe.has(p.id))showMatchOv(p);else if(type==='super'&&!error)toast('Super Like enviado! ⭐')}setTimeout(renderDeck,350)}

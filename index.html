@@ -614,11 +614,11 @@ async function loadAdminEvents(){
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div><h3>${esc(ev.name)}</h3><div class="ev-meta">${ic2('map-pin',12)} ${esc(ev.location||'Local não definido')} · ${dateStr} · ${timeStr}</div>${badge}</div>
       </div>
-      <div style="display:flex;gap:6px;margin-top:10px">
-        <button class="btn sm ghost" onclick="showEditEvent('${ev.id}','${esc(ev.name)}','${ev.date_time}','${esc(ev.location||'')}')" style="flex:1">${ic2('pencil',14)} Editar</button>
-        ${!ev.is_active?`<button class="btn sm" onclick="activateEvent('${ev.id}')" style="flex:1;background:var(--neon-green);color:#000">${ic2('check',14)} Ativar</button>`:`<button class="btn sm ghost" onclick="deactivateEvent('${ev.id}')" style="flex:1">${ic2('x',14)} Desativar</button>`}
-        <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1">${ic2('undo-2',14)} Resetar</button>
-        <button class="btn sm ghost" onclick="deleteEvent('${ev.id}','${esc(ev.name)}')" style="flex:1;border-color:var(--tinder1);color:var(--tinder1)">${ic2('x',14)} Excluir</button>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+        <button class="btn sm ghost" onclick="showEditEvent('${ev.id}','${esc(ev.name)}','${ev.date_time}','${esc(ev.location||'')}')" style="flex:1;min-width:45%">${ic2('pencil',14)} Editar</button>
+        ${!ev.is_active?`<button class="btn sm" onclick="activateEvent('${ev.id}')" style="flex:1;min-width:45%;background:var(--neon-green);color:#000">${ic2('check',14)} Ativar</button>`:`<button class="btn sm ghost" onclick="deactivateEvent('${ev.id}')" style="flex:1;min-width:45%">${ic2('x',14)} Desativar</button>`}
+        <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1;min-width:45%">${ic2('undo-2',14)} Resetar check-ins</button>
+        <button class="btn sm ghost" onclick="deleteEvent('${ev.id}','${esc(ev.name)}')" style="flex:1;min-width:45%;border-color:var(--tinder1);color:var(--tinder1)">${ic2('x',14)} Excluir</button>
       </div>
     </div>`;
   }).join('');

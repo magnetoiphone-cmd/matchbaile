@@ -646,8 +646,8 @@ async function showAdmin(){
   const s=$('#screen');s.className='screen-enter';
   s.innerHTML=`<h2>Painel Admin 🛡</h2>
     <div class="admin-tabs">
-      <button class="btn sm ${adminTab==='events'?'':'ghost'}" onclick="adminTab='events';showAdmin()" style="flex:1">🎉 Festas</button>
       <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">${ic2("clipboard",14)} Aprovar</button>
+      <button class="btn sm ${adminTab==='events'?'':'ghost'}" onclick="adminTab='events';showAdmin()" style="flex:1">🎉 Festas</button>
       <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">${ic2("users",14)} Usuários</button>
       <button class="btn sm ${adminTab==='msgs'?'':'ghost'}" onclick="adminTab='msgs';showAdmin()" style="flex:1">${ic2("message-circle",14)} Msgs</button>
     </div>

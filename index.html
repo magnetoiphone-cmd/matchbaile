@@ -586,7 +586,7 @@ async function showAdmin(){
 async function loadAdminEvents(){
   const c=$('#admin-content');
   const{data:events}=await sb.from('events').select('*').order('date_time',{ascending:false});
-  let h=`<button class="btn sm" onclick="showCreateEvent()" style="margin-bottom:14px">${ic2('plus',14)} Criar nova festa</button>`;
+  let h=`<button class="btn sm" onclick="showCreateEventForm()" style="margin-bottom:14px">${ic2('plus',14)} Criar nova festa</button>`;
   if(!events||!events.length){h+=`<p class="sub">Nenhuma festa criada ainda.</p>`;c.innerHTML=h;return}
   h+=events.map(ev=>{
     const d=new Date(ev.date_time);
@@ -613,7 +613,7 @@ async function loadAdminEvents(){
   c.innerHTML=h;
 }
 
-function showCreateEvent(){
+function showCreateEventForm(){
   const c=$('#admin-content');
   c.innerHTML=`
     <h2>Nova festa</h2>
@@ -622,11 +622,11 @@ function showCreateEvent(){
     <label>Local</label><input id="ev-location" maxlength="100" placeholder="Ex: Eskina Lounge">
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn ghost sm" onclick="loadAdminEvents()" style="flex:1">Cancelar</button>
-      <button class="btn sm" onclick="createEvent()" style="flex:1">${ic2('check',14)} Criar festa</button>
+      <button class="btn sm" onclick="createNewEvent()" style="flex:1">${ic2('check',14)} Criar festa</button>
     </div>`;
 }
 
-async function createEvent(){
+async function createNewEvent(){
   const name=$('#ev-name').value.trim();
   const dateVal=$('#ev-date').value;
   const location=$('#ev-location').value.trim();

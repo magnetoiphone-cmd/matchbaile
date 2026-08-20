@@ -309,6 +309,16 @@ nav button.on svg{stroke:var(--tinder2)}
 .screen-enter{animation:fadeUp .35s ease both}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- cookie banner ---- */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);padding:16px 20px calc(16px + env(safe-area-inset-bottom));z-index:45;animation:fadeUp .4s ease;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.cookie-banner p{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:12px}
+.cookie-banner a{color:var(--neon-amber);text-decoration:underline}
+.cookie-banner .cb-btns{display:flex;gap:8px}
+.cookie-banner .cb-btns button{flex:1;padding:10px;border-radius:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:transform .15s}
+.cookie-banner .cb-btns button:active{transform:scale(.95)}
+.cookie-banner .cb-btns .accept{background:var(--grad);color:#fff}
+.cookie-banner .cb-btns .reject{background:transparent;border:1px solid var(--line);color:var(--dim)}
 </style>
 </head>
 <body>
@@ -318,6 +328,13 @@ nav button.on svg{stroke:var(--tinder2)}
   <div id="screen" class="empty"><div class="big pulse">🔥</div><p>Carregando…</p></div>
 </div>
 <nav id="nav" class="hidden"></nav>
+<div id="cookie-banner" class="cookie-banner hidden">
+  <p>🍪 Usamos cookies pra salvar sua sessão e deixar o app mais rápido. Seus dados ficam seguros e não são compartilhados com terceiros.</p>
+  <div class="cb-btns">
+    <button class="reject" onclick="cookieChoice(false)">Recusar</button>
+    <button class="accept" onclick="cookieChoice(true)">Aceitar cookies</button>
+  </div>
+</div>
 <script>
 const SUPABASE_URL="https://qxilrbytbotkweyhhpcm.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_n19ifiWmYyROmzNgQEkpZQ_u0OdUghk";
@@ -326,6 +343,38 @@ let sb=null;
 try{sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch(e){}
 const $=s=>document.querySelector(s);
 let me=null,tab='swipe',deck=[],myLikes=new Set(),likedMe=new Set(),lastSwiped=null,chatSub=null;
+
+/* ---- Cookies & Cache ---- */
+function getCookie(n){const v=document.cookie.match('(^|;)\\s*'+n+'=([^;]*)');return v?v[2]:null}
+function setCookie(n,v,days=365){document.cookie=n+'='+v+';path=/;max-age='+(days*86400)+';SameSite=Lax'}
+const cookiesAccepted=getCookie('cookies_ok')==='1';
+
+function cookieChoice(accept){
+  if(accept){
+    setCookie('cookies_ok','1');
+    toast('Cookies aceitos! App mais rápido agora ⚡');
+  }else{
+    setCookie('cookies_ok','0',1);
+    toast('Cookies recusados.');
+  }
+  $('#cookie-banner').classList.add('hidden');
+}
+
+// Mostrar banner se ainda não escolheu
+if(!getCookie('cookies_ok')) setTimeout(()=>$('#cookie-banner').classList.remove('hidden'),1500);
+
+// Cache helpers (só funciona se aceitou cookies)
+const cache={
+  set(key,data,ttl=60000){
+    if(!cookiesAccepted)return;
+    try{sessionStorage.setItem('tm_'+key,JSON.stringify({data,exp:Date.now()+ttl}))}catch(e){}
+  },
+  get(key){
+    if(!cookiesAccepted)return null;
+    try{const raw=sessionStorage.getItem('tm_'+key);if(!raw)return null;const{data,exp}=JSON.parse(raw);if(Date.now()>exp){sessionStorage.removeItem('tm_'+key);return null}return data}catch(e){return null}
+  },
+  clear(){try{Object.keys(sessionStorage).filter(k=>k.startsWith('tm_')).forEach(k=>sessionStorage.removeItem(k))}catch(e){}}
+};
 
 function toast(m){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3200)}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
@@ -409,7 +458,7 @@ async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt
 function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
 function showBanned(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">🚫</div><h2>Conta suspensa</h2><p class="sub">Sua conta foi suspensa pela organização da festa. Entre em contato se achar que foi um engano.</p><button class="link-btn" onclick="doLogout()">Sair</button>`}
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;render()}
-async function doLogout(){if(chatSub)chatSub.unsubscribe();await sb.auth.signOut();me=null;showLogin()}
+async function doLogout(){if(chatSub)chatSub.unsubscribe();cache.clear();await sb.auth.signOut();me=null;showLogin()}
 
 function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">${ic2('flame',16)} Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">${ic2('message-circle',16)} Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">${ic2('trophy',16)} Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">${ic2('user',16)} Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">${ic2('shield',16)}<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
@@ -419,8 +468,11 @@ let swipeFilter='todos';
 let activeEvent=null;
 
 async function loadActiveEvent(){
+  const cached=cache.get('active_event');
+  if(cached!==null){activeEvent=cached;return}
   const{data}=await sb.from('events').select('*').eq('is_active',true).limit(1).maybeSingle();
   activeEvent=data;
+  cache.set('active_event',data,60000);
 }
 
 function getPartyStatus(){
@@ -576,12 +628,17 @@ function viewImage(url){const v=document.createElement('div');v.className='img-v
 /* ============ RANKING ============ */
 async function showRanking(){
   const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="empty"><div class="big pulse">🏆</div></div>`;
-  const[rankRes,profsRes]=await Promise.all([
-    sb.rpc('get_ranking'),
-    sb.from('profiles').select('*').eq('status','approved').eq('visible',true)
-  ]);
-  const ranking=rankRes.data||[];
-  const profs=profsRes.data||[];
+  const cached=cache.get('ranking');
+  let ranking,profs;
+  if(cached){ranking=cached.ranking;profs=cached.profs}
+  else{
+    const[rankRes,profsRes]=await Promise.all([
+      sb.rpc('get_ranking'),
+      sb.from('profiles').select('*').eq('status','approved').eq('visible',true)
+    ]);
+    ranking=rankRes.data||[];profs=profsRes.data||[];
+    cache.set('ranking',{ranking,profs},30000);
+  }
   const profMap={};profs.forEach(p=>profMap[p.id]=p);
   const ranked=ranking.filter(r=>profMap[r.profile_id]).map(r=>[r.profile_id,Number(r.points)]);
   if(ranked.length===0){s.className='empty screen-enter';s.innerHTML=`<div class="big">🏆</div><h2>Ranking</h2><p class="sub">Ainda não tem likes suficientes.<br>Bora arrastar! 🔥</p>`;return}

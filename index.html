@@ -519,7 +519,7 @@ async function showRanking(){
   const profMap={};profs.forEach(p=>profMap[p.id]=p);
   const ranked=ranking.filter(r=>profMap[r.profile_id]).map(r=>[r.profile_id,Number(r.points)]);
   if(ranked.length===0){s.className='empty screen-enter';s.innerHTML=`<div class="big">🏆</div><h2>Ranking</h2><p class="sub">Ainda não tem likes suficientes.<br>Bora arrastar! 🔥</p>`;return}
-  let h=`<h2>🏆 Mais desejados da festa</h2>`;
+  let h=`<h2>🏆 Mais desejados do Tokyo Match</h2><p class="sub" style="margin-top:-8px">Ranking semanal · reseta toda segunda 00:00</p>`;
   const top3=ranked.slice(0,3);
   if(top3.length>=2){
     const order=top3.length===3?[1,0,2]:[1,0];

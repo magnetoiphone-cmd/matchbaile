@@ -6,12 +6,12 @@
 <title>Tokyo Match 🔥</title>
 
 <!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico?v=3">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png?v=3">
+<link rel="apple-touch-icon" href="icon-192.png?v=3">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=3">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -255,11 +255,11 @@ img[loading=lazy]{content-visibility:auto}
 /* ---- chat menu ---- */
 .chat-menu-btn{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;padding:6px;margin-left:auto;transition:transform .15s}
 .chat-menu-btn:active{transform:scale(.85)}
-.chat-dropdown{position:absolute;top:56px;right:16px;background:var(--card-solid);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:39;min-width:190px;animation:fadeUp .2s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.chat-dropdown{position:fixed;top:60px;right:20px;background:var(--card-solid);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:47;min-width:190px;animation:fadeUp .2s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .chat-dropdown button{width:100%;background:none;border:none;color:var(--txt);font-family:inherit;font-size:14px;font-weight:600;padding:13px 14px;text-align:left;cursor:pointer;border-radius:10px;display:flex;align-items:center;gap:10px;transition:background .15s}
 .chat-dropdown button:active{background:rgba(255,255,255,.08)}
 .chat-dropdown button.danger{color:var(--tinder1)}
-.chat-dropdown-overlay{position:fixed;inset:0;z-index:38}
+.chat-dropdown-overlay{position:fixed;inset:0;z-index:46}
 
 /* ---- date separator ---- */
 .msg-date{text-align:center;color:var(--dim);font-size:11px;font-weight:600;margin:14px 0 8px;letter-spacing:.5px}
@@ -775,11 +775,11 @@ function initSwipeRow(el){
 
 async function deleteConvo(otherId,name){
   if(!confirm(`Desfazer match com ${name}? A conversa e o match serão apagados pra sempre.`))return;
-  // Apaga mensagens dos dois lados
   await sb.from('messages').delete().or(`and(sender.eq.${me.id},receiver.eq.${otherId}),and(sender.eq.${otherId},receiver.eq.${me.id})`);
-  // Desfaz o match: remove meu like nela (o like dela em mim continua, mas sem match)
   await sb.from('likes').delete().eq('liker',me.id).eq('liked',otherId);
-  toast('Match desfeito.');showMatches();
+  // fecha o chat se estiver aberto
+  const cs=$('#chat-screen');if(cs){if(chatSub)chatSub.unsubscribe();chatSub=null;currentChatId=null;cs.remove();$('#nav').classList.remove('hidden')}
+  toast('Match desfeito.');tab='matches';render();
 }
 
 /* ============ CHAT ============ */
@@ -808,14 +808,20 @@ async function showProfileOverlay(userId){
 
 async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const dot=other.at_party?`<div style="width:8px;height:8px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 6px var(--neon-green);flex-shrink:0"></div>`:'';const chatEl=document.createElement('div');chatEl.className='chat-screen';chatEl.id='chat-screen';chatEl.innerHTML=`<div class="chat-header" style="position:relative"><button class="back" onclick="closeChat()">${ic2("arrow-left",22)}</button>${optimImg(getPhotos(other)[0]||other.photo_url,'',100,true)}<b onclick="showProfileOverlay('${otherId}')" style="cursor:pointer;flex:1">${esc(other.name)}</b>${dot}<button class="chat-menu-btn" onclick="toggleChatMenu('${otherId}','${esc(other.name)}')">⋯</button></div><div class="chat-msgs" id="chatmsgs"></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">${ic2('camera',18)}</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn send" onclick="sendMsg('${otherId}')">${ic2('send',18)}</button></div>`;document.body.appendChild(chatEl);$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
 function toggleChatMenu(otherId,name){
-  const existing=$('#chat-dropdown');if(existing){closeChatMenu();return}
+  if($('#chat-dropdown')){closeChatMenu();return}
   const header=document.querySelector('.chat-header');if(!header)return;
-  const ov=document.createElement('div');ov.id='chat-dropdown-ov';ov.className='chat-dropdown-overlay';ov.onclick=closeChatMenu;
+  // Overlay primeiro (fica atrás)
+  const ov=document.createElement('div');ov.id='chat-dropdown-ov';ov.className='chat-dropdown-overlay';
+  ov.addEventListener('click',closeChatMenu);
+  document.body.appendChild(ov);
+  // Dropdown depois (fica na frente)
   const dd=document.createElement('div');dd.id='chat-dropdown';dd.className='chat-dropdown';
-  const btnProfile=document.createElement('button');btnProfile.innerHTML=`${ic2('user',18)} Ver perfil`;btnProfile.onclick=()=>{closeChatMenu();showProfileOverlay(otherId)};
-  const btnDelete=document.createElement('button');btnDelete.className='danger';btnDelete.innerHTML=`${ic2('x',18)} Excluir conversa`;btnDelete.onclick=()=>{closeChatMenu();deleteConvo(otherId,name)};
+  const btnProfile=document.createElement('button');btnProfile.innerHTML=`${ic2('user',18)} Ver perfil`;
+  btnProfile.addEventListener('click',ev=>{ev.stopPropagation();closeChatMenu();showProfileOverlay(otherId)});
+  const btnDelete=document.createElement('button');btnDelete.className='danger';btnDelete.innerHTML=`${ic2('x',18)} Excluir conversa`;
+  btnDelete.addEventListener('click',ev=>{ev.stopPropagation();closeChatMenu();deleteConvo(otherId,name)});
   dd.appendChild(btnProfile);dd.appendChild(btnDelete);
-  header.appendChild(ov);header.appendChild(dd);
+  document.body.appendChild(dd);
 }
 function closeChatMenu(){const dd=$('#chat-dropdown');const ov=$('#chat-dropdown-ov');if(dd)dd.remove();if(ov)ov.remove()}
 function closeChat(){if(chatSub)chatSub.unsubscribe();chatSub=null;currentChatId=null;const cs=$('#chat-screen');if(cs)cs.remove();$('#nav').classList.remove('hidden');tab='matches';render()}

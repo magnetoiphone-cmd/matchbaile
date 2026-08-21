@@ -472,18 +472,32 @@ function ic2(name,size=20,sw=2){
 
 function spawnConfetti(){const w=document.createElement('div');w.className='confetti-wrap';document.body.appendChild(w);const colors=['#fd267a','#ff6036','#ff8c00','#2bff6f','#a855f7','#fff'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.width=(4+Math.random()*6)+'px';c.style.height=(4+Math.random()*6)+'px';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';w.appendChild(c)}setTimeout(()=>w.remove(),5000)}
 
+/* ---- Notifications ---- */
+let notifEnabled=false;
+async function requestNotifPermission(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='granted'){notifEnabled=true;return}
+  if(Notification.permission==='denied')return;
+  const perm=await Notification.requestPermission();
+  notifEnabled=perm==='granted';
+}
+function sendNotif(title,body,icon){
+  if(!notifEnabled||document.hasFocus())return;
+  try{new Notification(title,{body,icon:icon||'🔥',badge:'🔥',tag:title})}catch(e){}
+}
+
 /* ============ BOOT ============ */
-async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}render()}
+async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}requestNotifPermission();setupGlobalListener();render()}
 
 /* ============ LOGIN ============ */
 function showLogin(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tokyo Match - Essa Sexta"></div><h2>Entrar 🔥</h2><p class="sub">Faz login com teu @ do Instagram.</p><label>@ do Instagram</label><input id="l-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha</label><input id="l-pass" type="password" maxlength="60" placeholder="Sua senha"><button class="btn" id="l-go">Entrar</button><div style="text-align:center"><button class="link-btn" id="l-reg">Não tem conta? Criar agora</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#l-go').onclick=doLogin;$('#l-reg').onclick=showRegister;$('#l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})}
-async function doLogin(){const u=cleanIG($('#l-user').value),p=$('#l-pass').value;if(!u){toast('Coloca teu @!');return}if(!p){toast('Coloca tua senha!');return}const btn=$('#l-go');btn.disabled=true;btn.textContent='Entrando…';try{const{data,error}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});if(error)throw error;const{data:prof}=await sb.from('profiles').select('*').eq('id',data.user.id).maybeSingle();me=prof;if(!me){showProfileSetup(u);return}render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Entrar'}}
+async function doLogin(){const u=cleanIG($('#l-user').value),p=$('#l-pass').value;if(!u){toast('Coloca teu @!');return}if(!p){toast('Coloca tua senha!');return}const btn=$('#l-go');btn.disabled=true;btn.textContent='Entrando…';try{const{data,error}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});if(error)throw error;const{data:prof}=await sb.from('profiles').select('*').eq('id',data.user.id).maybeSingle();me=prof;if(!me){showProfileSetup(u);return}requestNotifPermission();setupGlobalListener();render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Entrar'}}
 function showRegister(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div class="flyer"><img src="flyer.png" alt="Tokyo Match - Essa Sexta"></div><h2>Criar conta 🔥</h2><p class="sub">Use seu @ do Instagram como login.</p><label>@ do Instagram</label><input id="r-user" maxlength="40" placeholder="seu_perfil" autocapitalize="none" autocorrect="off"><label>Senha (mínimo 6 caracteres)</label><input id="r-pass" type="password" maxlength="60" placeholder="Crie uma senha"><label>Confirmar senha</label><input id="r-pass2" type="password" maxlength="60" placeholder="Repita a senha"><button class="btn" id="r-go">Criar conta</button><div style="text-align:center"><button class="link-btn" id="r-back">Já tem conta? Entrar</button></div><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a>`;$('#r-go').onclick=doRegister;$('#r-back').onclick=showLogin}
 async function doRegister(){const u=cleanIG($('#r-user').value),p=$('#r-pass').value,p2=$('#r-pass2').value;if(!u||u.length<2){toast('@ precisa ter pelo menos 2 caracteres.');return}if(!p||p.length<6){toast('Senha: mínimo 6 caracteres.');return}if(p!==p2){toast('As senhas não batem!');return}const btn=$('#r-go');btn.disabled=true;btn.textContent='Criando…';try{const{error}=await sb.auth.signUp({email:toEmail(u),password:p});if(error)throw error;const{error:le}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});if(le)throw le;showProfileSetup(u)}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Criar conta'}}
 
 /* ============ PROFILE SETUP ============ */
 let setupPhotos=[];
-function showProfileSetup(ig){$('#nav').classList.add('hidden');setupPhotos=[];const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Entra na pista 🔥</h2><p class="sub">Monta teu perfil com até 6 fotos.</p><div class="photo-grid" id="pgrid"></div><input type="file" id="pfile" accept="image/*" class="hidden" multiple><label>Nome</label><input id="f-name" maxlength="40" placeholder="Como te chamam na pista"><label>Idade</label><input id="f-age" type="number" min="18" max="99" placeholder="18+"><label>Instagram</label><input id="f-ig" maxlength="40" placeholder="@seu_perfil" value="${esc(ig||'')}"><label>Gênero</label><select id="f-gender"><option value="">Selecione</option><option value="homem">Homem</option><option value="mulher">Mulher</option><option value="outro">Outro</option></select><label>Quero ver</label><select id="f-pref"><option value="todos">Todos</option><option value="homens">Homens</option><option value="mulheres">Mulheres</option></select><label>Bio</label><textarea id="f-bio" maxlength="160" placeholder="Fala algo que faça alguém arrastar pra direita"></textarea><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a><button class="btn" id="f-go">Criar perfil</button>`;renderPhotoGrid();$('#pfile').onchange=e=>{for(const f of e.target.files){if(setupPhotos.length<6)setupPhotos.push({file:f,url:URL.createObjectURL(f)})}renderPhotoGrid()};$('#f-go').onclick=submitProfile}
+function showProfileSetup(ig){$('#nav').classList.add('hidden');setupPhotos=[];const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div style="margin-bottom:10px"><button class="link-btn" onclick="doLogout()" style="margin:0">${ic2('arrow-left',14)} Voltar pro login</button></div><h2>Entra na pista 🔥</h2><p class="sub">Monta teu perfil com até 6 fotos.</p><div class="photo-grid" id="pgrid"></div><input type="file" id="pfile" accept="image/*" class="hidden" multiple><label>Nome</label><input id="f-name" maxlength="40" placeholder="Como te chamam na pista"><label>Idade</label><input id="f-age" type="number" min="18" max="99" placeholder="18+"><label>Instagram</label><input id="f-ig" maxlength="40" placeholder="@seu_perfil" value="${esc(ig||'')}"><label>Gênero</label><select id="f-gender"><option value="">Selecione</option><option value="homem">Homem</option><option value="mulher">Mulher</option><option value="outro">Outro</option></select><label>Quero ver</label><select id="f-pref"><option value="todos">Todos</option><option value="homens">Homens</option><option value="mulheres">Mulheres</option></select><label>Bio</label><textarea id="f-bio" maxlength="160" placeholder="Fala algo que faça alguém arrastar pra direita"></textarea><a href="https://hypeingressos.com.br/evento/tinder-match-" target="_blank" class="ticket-cta"><span>🎟</span> Compre seu ingresso</a><button class="btn" id="f-go">Criar perfil</button>`;renderPhotoGrid();$('#pfile').onchange=e=>{for(const f of e.target.files){if(setupPhotos.length<6)setupPhotos.push({file:f,url:URL.createObjectURL(f)})}renderPhotoGrid()};$('#f-go').onclick=submitProfile}
 function renderPhotoGrid(){const g=$('#pgrid');let h='';for(let i=0;i<6;i++){const p=setupPhotos[i];const c=i===0?'photo-slot main':'photo-slot';if(p)h+=`<div class="${c}"><img src="${p.url}"><div class="remove" onclick="removeSetupPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#pfile').click()">${ic2('plus',28,1.5)}</div>`}g.innerHTML=h}
 function removeSetupPhoto(i){setupPhotos.splice(i,1);renderPhotoGrid()}
 async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const webp=await toWebP(p.file);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,status:'approved'}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Criar perfil'}}
@@ -492,7 +506,54 @@ async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt
 function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
 function showBanned(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">🚫</div><h2>Conta suspensa</h2><p class="sub">Sua conta foi suspensa pela organização da festa. Entre em contato se achar que foi um engano.</p><button class="link-btn" onclick="doLogout()">Sair</button>`}
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;render()}
-async function doLogout(){if(chatSub)chatSub.unsubscribe();cache.clear();await sb.auth.signOut();me=null;showLogin()}
+async function doLogout(){if(chatSub)chatSub.unsubscribe();if(window._globalSub)window._globalSub.unsubscribe();cache.clear();await sb.auth.signOut();me=null;showLogin()}
+
+let globalMsgCount=0;
+function setupGlobalListener(){
+  if(window._globalSub)window._globalSub.unsubscribe();
+  // Escuta novas mensagens em tempo real
+  window._globalSub=sb.channel('global-notif-'+me.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},async payload=>{
+      // Não notifica se tá no chat com essa pessoa
+      if(currentChatId===payload.new.sender)return;
+      const{data:sender}=await sb.from('profiles').select('name,photo_url,photos').eq('id',payload.new.sender).maybeSingle();
+      const name=sender?sender.name:'Alguém';
+      let preview=payload.new.content;
+      if(preview.startsWith('[img]'))preview='📷 Enviou uma foto';
+      toast(`💬 ${name}: ${preview.slice(0,40)}`);
+      sendNotif('Nova mensagem 💬',`${name}: ${preview.slice(0,60)}`,getPhotos(sender||{})[0]||'');
+      // Atualiza badge do chat
+      globalMsgCount++;
+      updateChatBadge();
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'likes',filter:`liked=eq.${me.id}`},async payload=>{
+      const{data:liker}=await sb.from('profiles').select('name,photo_url,photos').eq('id',payload.new.liker).maybeSingle();
+      const name=liker?liker.name:'Alguém';
+      // Verifica se eu já curti essa pessoa (= match!)
+      const{data:myLike}=await sb.from('likes').select('liker').eq('liker',me.id).eq('liked',payload.new.liker).maybeSingle();
+      if(myLike){
+        toast(`🔥 Deu match com ${name}!`);
+        sendNotif('Deu Match! 🔥',`Você e ${name} deram match!`,getPhotos(liker||{})[0]||'');
+      }else{
+        if(payload.new.is_super){
+          toast(`⭐ ${name} te deu um Super Like!`);
+          sendNotif('Super Like! ⭐',`${name} te deu um Super Like!`,getPhotos(liker||{})[0]||'');
+        }else{
+          sendNotif('Alguém te curtiu! 💗','Abre o app pra ver quem é 👀');
+        }
+      }
+    })
+    .subscribe();
+}
+
+function updateChatBadge(){
+  const chatBtn=document.querySelector('nav button[data-t="matches"]');
+  if(chatBtn&&globalMsgCount>0){
+    let badge=chatBtn.querySelector('.badge');
+    if(!badge){badge=document.createElement('span');badge.className='badge';chatBtn.appendChild(badge)}
+    badge.textContent=globalMsgCount;
+  }
+}
 
 function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">${ic2('flame',16)} Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">${ic2('message-circle',16)} Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">${ic2('trophy',16)} Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">${ic2('user',16)} Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">${ic2('shield',16)}<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
@@ -604,7 +665,7 @@ async function undoSwipe(){if(!lastSwiped){toast('Nada pra desfazer.');return}co
 function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');ov.className='match-ov';ov.innerHTML=`<h1>DEU<br>MATCH! 🔥</h1><div class="pair">${optimImg(getPhotos(me)[0]||me.photo_url,'',200,true)}${optimImg(getPhotos(p)[0]||p.photo_url,'',200,true)}</div><div style="animation:fadeUp .4s ease .5s both"><b style="font-size:18px">${esc(p.name)}</b></div><div class="ig" style="animation:fadeUp .4s ease .55s both">${p.instagram?'@'+esc(p.instagram.replace('@','')):''}</div><button class="btn" style="max-width:220px" onclick="this.parentElement.remove();tab='matches';render()">Mandar mensagem</button><button class="btn ghost" style="max-width:220px" onclick="this.parentElement.remove()">Continuar na pista</button>`;document.body.appendChild(ov)}
 
 /* ============ MATCHES ============ */
-async function showMatches(){const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};const msgCount={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m;msgCount[o]=(msgCount[o]||0)+1});const mv=$('#matchview');let h='';
+async function showMatches(){globalMsgCount=0;const chatBtn=document.querySelector('nav button[data-t="matches"]');if(chatBtn){const b=chatBtn.querySelector('.badge');if(b)b.remove()}const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};const msgCount={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m;msgCount[o]=(msgCount[o]||0)+1});const mv=$('#matchview');let h='';
   // quem curtiu você
   if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''} ${p.at_party?'at-party':''}" onclick="showProfileOverlay('${l.liker}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120)}<p>${esc(p.name)}</p></div>`});h+=`</div>`}
   // separar novos matches (sem mensagens) e conversas ativas

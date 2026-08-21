@@ -247,7 +247,7 @@ img[loading=lazy]{content-visibility:auto}
 .swipe-row{position:relative;overflow:hidden;border-radius:18px;margin-bottom:8px;animation:fadeUp .35s ease both}
 .swipe-row .row{margin-bottom:0;border-radius:18px;position:relative;z-index:2;transition:transform .2s ease;background:#131318}
 .swipe-row .swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:1;border-radius:0 18px 18px 0;overflow:hidden}
-.swipe-row .swipe-actions button{border:none;padding:0 20px;font-family:inherit;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#fff}
+.swipe-row .swipe-actions button{border:none;padding:0 16px;font-family:inherit;font-weight:700;font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;min-width:80px}
 .swipe-row .swipe-actions .sw-profile{background:var(--super)}
 .swipe-row .swipe-actions .sw-delete{background:var(--tinder1)}
 
@@ -730,27 +730,34 @@ async function showMatches(){globalMsgCount=0;const chatBtn=document.querySelect
 
 function initSwipeRow(el){
   const row=el.querySelector('.row');
-  let sx=0,dx=0,dragging=false;
-  row.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;dragging=true},{passive:true});
+  const REVEAL=160;
+  let sx=0,sy=0,dx=0,dragging=false,decided=false,horizontal=false;
+  row.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dragging=true;decided=false;horizontal=false},{passive:true});
   row.addEventListener('touchmove',e=>{
     if(!dragging)return;
-    dx=e.touches[0].clientX-sx;
-    if(dx>0)dx=0; // só pra esquerda
-    if(dx<-140)dx=-140;
+    const cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+    const ddx=cx-sx,ddy=cy-sy;
+    if(!decided){if(Math.abs(ddx)>Math.abs(ddy)&&Math.abs(ddx)>8){horizontal=true}decided=Math.abs(ddx)>8||Math.abs(ddy)>8}
+    if(!horizontal)return;
+    dx=ddx;
+    if(dx>0)dx=0;
+    if(dx<-REVEAL)dx=-REVEAL;
     row.style.transform=`translateX(${dx}px)`;
   },{passive:true});
   row.addEventListener('touchend',()=>{
     dragging=false;
-    if(dx<-60){row.style.transform='translateX(-140px)'}
-    else{row.style.transform='translateX(0)'}
+    if(horizontal){if(dx<-70){row.style.transform=`translateX(-${REVEAL}px)`}else{row.style.transform='translateX(0)'}}
     dx=0;
   });
 }
 
 async function deleteConvo(otherId,name){
-  if(!confirm(`Excluir conversa com ${name}? As mensagens serão apagadas.`))return;
+  if(!confirm(`Desfazer match com ${name}? A conversa e o match serão apagados pra sempre.`))return;
+  // Apaga mensagens dos dois lados
   await sb.from('messages').delete().or(`and(sender.eq.${me.id},receiver.eq.${otherId}),and(sender.eq.${otherId},receiver.eq.${me.id})`);
-  toast('Conversa excluída.');showMatches();
+  // Desfaz o match: remove meu like nela (o like dela em mim continua, mas sem match)
+  await sb.from('likes').delete().eq('liker',me.id).eq('liked',otherId);
+  toast('Match desfeito.');showMatches();
 }
 
 /* ============ CHAT ============ */

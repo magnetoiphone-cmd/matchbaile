@@ -8,7 +8,14 @@
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="og-image.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tokyo Match">
 <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 
 <!-- Preview WhatsApp / Instagram / Redes Sociais -->
@@ -503,6 +510,9 @@ function sendNotif(title,body,icon){
   if(!notifEnabled||document.hasFocus())return;
   try{new Notification(title,{body,icon:icon||'🔥',badge:'🔥',tag:title})}catch(e){}
 }
+
+// Register Service Worker (PWA)
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
 
 /* ============ BOOT ============ */
 async function boot(){if(!sb)return;const{data:{session}}=await sb.auth.getSession();if(!session){showLogin();return}const{data:prof}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();me=prof;if(!me){showProfileSetup();return}requestNotifPermission();setupGlobalListener();render()}

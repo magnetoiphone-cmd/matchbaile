@@ -245,8 +245,8 @@ img[loading=lazy]{content-visibility:auto}
 
 /* ---- swipe to delete ---- */
 .swipe-row{position:relative;overflow:hidden;border-radius:18px;margin-bottom:8px;animation:fadeUp .35s ease both}
-.swipe-row .row{margin-bottom:0;border-radius:0;position:relative;z-index:2;transition:transform .2s ease}
-.swipe-row .swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:1}
+.swipe-row .row{margin-bottom:0;border-radius:18px;position:relative;z-index:2;transition:transform .2s ease;background:#131318}
+.swipe-row .swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;z-index:1;border-radius:0 18px 18px 0;overflow:hidden}
 .swipe-row .swipe-actions button{border:none;padding:0 20px;font-family:inherit;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#fff}
 .swipe-row .swipe-actions .sw-profile{background:var(--super)}
 .swipe-row .swipe-actions .sw-delete{background:var(--tinder1)}

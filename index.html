@@ -254,11 +254,11 @@ img[loading=lazy]{content-visibility:auto}
 /* ---- chat menu ---- */
 .chat-menu-btn{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;padding:6px;margin-left:auto;transition:transform .15s}
 .chat-menu-btn:active{transform:scale(.85)}
-.chat-dropdown{position:absolute;top:56px;right:16px;background:var(--card-solid);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:38;min-width:180px;animation:fadeUp .2s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.chat-dropdown button{width:100%;background:none;border:none;color:var(--txt);font-family:inherit;font-size:14px;font-weight:600;padding:12px 14px;text-align:left;cursor:pointer;border-radius:10px;display:flex;align-items:center;gap:10px;transition:background .15s}
-.chat-dropdown button:active{background:rgba(255,255,255,.06)}
+.chat-dropdown{position:absolute;top:56px;right:16px;background:var(--card-solid);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:39;min-width:190px;animation:fadeUp .2s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.chat-dropdown button{width:100%;background:none;border:none;color:var(--txt);font-family:inherit;font-size:14px;font-weight:600;padding:13px 14px;text-align:left;cursor:pointer;border-radius:10px;display:flex;align-items:center;gap:10px;transition:background .15s}
+.chat-dropdown button:active{background:rgba(255,255,255,.08)}
 .chat-dropdown button.danger{color:var(--tinder1)}
-.chat-dropdown-overlay{position:fixed;inset:0;z-index:37}
+.chat-dropdown-overlay{position:fixed;inset:0;z-index:38}
 
 /* ---- date separator ---- */
 .msg-date{text-align:center;color:var(--dim);font-size:11px;font-weight:600;margin:14px 0 8px;letter-spacing:.5px}
@@ -786,12 +786,16 @@ async function showProfileOverlay(userId){
 
 async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const dot=other.at_party?`<div style="width:8px;height:8px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 6px var(--neon-green);flex-shrink:0"></div>`:'';const chatEl=document.createElement('div');chatEl.className='chat-screen';chatEl.id='chat-screen';chatEl.innerHTML=`<div class="chat-header" style="position:relative"><button class="back" onclick="closeChat()">${ic2("arrow-left",22)}</button>${optimImg(getPhotos(other)[0]||other.photo_url,'',100,true)}<b onclick="showProfileOverlay('${otherId}')" style="cursor:pointer;flex:1">${esc(other.name)}</b>${dot}<button class="chat-menu-btn" onclick="toggleChatMenu('${otherId}','${esc(other.name)}')">⋯</button></div><div class="chat-msgs" id="chatmsgs"></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">${ic2('camera',18)}</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn send" onclick="sendMsg('${otherId}')">${ic2('send',18)}</button></div>`;document.body.appendChild(chatEl);$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
 function toggleChatMenu(otherId,name){
-  const existing=$('#chat-dropdown');if(existing){existing.remove();$('#chat-dropdown-ov')?.remove();return}
-  const ov=document.createElement('div');ov.id='chat-dropdown-ov';ov.className='chat-dropdown-overlay';ov.onclick=()=>{ov.remove();$('#chat-dropdown')?.remove()};
+  const existing=$('#chat-dropdown');if(existing){closeChatMenu();return}
+  const header=document.querySelector('.chat-header');if(!header)return;
+  const ov=document.createElement('div');ov.id='chat-dropdown-ov';ov.className='chat-dropdown-overlay';ov.onclick=closeChatMenu;
   const dd=document.createElement('div');dd.id='chat-dropdown';dd.className='chat-dropdown';
-  dd.innerHTML=`<button onclick="$('#chat-dropdown-ov').remove();$('#chat-dropdown').remove();showProfileOverlay('${otherId}')">${ic2('user',18)} Ver perfil</button><button class="danger" onclick="$('#chat-dropdown-ov').remove();$('#chat-dropdown').remove();deleteConvo('${otherId}','${name}')">${ic2('x',18)} Excluir conversa</button>`;
-  document.querySelector('.chat-header').appendChild(ov);document.querySelector('.chat-header').appendChild(dd);
+  const btnProfile=document.createElement('button');btnProfile.innerHTML=`${ic2('user',18)} Ver perfil`;btnProfile.onclick=()=>{closeChatMenu();showProfileOverlay(otherId)};
+  const btnDelete=document.createElement('button');btnDelete.className='danger';btnDelete.innerHTML=`${ic2('x',18)} Excluir conversa`;btnDelete.onclick=()=>{closeChatMenu();deleteConvo(otherId,name)};
+  dd.appendChild(btnProfile);dd.appendChild(btnDelete);
+  header.appendChild(ov);header.appendChild(dd);
 }
+function closeChatMenu(){const dd=$('#chat-dropdown');const ov=$('#chat-dropdown-ov');if(dd)dd.remove();if(ov)ov.remove()}
 function closeChat(){if(chatSub)chatSub.unsubscribe();chatSub=null;currentChatId=null;const cs=$('#chat-screen');if(cs)cs.remove();$('#nav').classList.remove('hidden');tab='matches';render()}
 let lastMsgDate='';
 async function loadMessages(otherId){const{data}=await sb.from('messages').select('*').or(`and(sender.eq.${me.id},receiver.eq.${otherId}),and(sender.eq.${otherId},receiver.eq.${me.id})`).order('created_at',{ascending:true});const c=$('#chatmsgs');c.innerHTML='';lastMsgDate='';(data||[]).forEach(m=>appendMsg(m,false));c.scrollTop=c.scrollHeight}
@@ -868,7 +872,41 @@ async function showRanking(){
 }
 
 /* ============ PERFIL ============ */
-function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">${ic2('image-plus',16)} Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">${ic2('log-out',16)} Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
+function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">${ic2('image-plus',16)} Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="shareProfile()">${ic2('send',16)} Compartilhar no Stories</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">${ic2('log-out',16)} Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
+
+async function shareProfile(){
+  toast('Gerando sua imagem…');
+  const photos=getPhotos(me);
+  const photoUrl=photos[0]||me.photo_url;
+  if(!photoUrl){toast('Adiciona uma foto primeiro!');return}
+  try{
+    const img=new Image();img.crossOrigin='anonymous';
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=thumb(photoUrl,800)});
+    const cv=document.createElement('canvas');cv.width=1080;cv.height=1920;const ctx=cv.getContext('2d');
+    const bg=ctx.createLinearGradient(0,0,1080,1920);bg.addColorStop(0,'#1a0a12');bg.addColorStop(.5,'#08080c');bg.addColorStop(1,'#1a0f08');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
+    const glow=ctx.createRadialGradient(540,300,0,540,300,700);glow.addColorStop(0,'rgba(253,38,122,.25)');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,1000);
+    const size=560,cx=540,cy=760;
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,size/2,0,Math.PI*2);ctx.closePath();ctx.clip();
+    const ar=img.width/img.height;let dw=size,dh=size,dx=cx-size/2,dy=cy-size/2;if(ar>1){dh=size;dw=size*ar;dx=cx-dw/2}else{dw=size;dh=size/ar;dy=cy-dh/2}
+    ctx.drawImage(img,dx,dy,dw,dh);ctx.restore();
+    ctx.lineWidth=10;const bgrad=ctx.createLinearGradient(cx-size/2,cy-size/2,cx+size/2,cy+size/2);bgrad.addColorStop(0,'#fd267a');bgrad.addColorStop(1,'#ff8c00');ctx.strokeStyle=bgrad;ctx.beginPath();ctx.arc(cx,cy,size/2,0,Math.PI*2);ctx.stroke();
+    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 76px Archivo,sans-serif';ctx.fillText(`${me.name}, ${me.age||''}`,540,1180);
+    if(me.instagram){ctx.fillStyle='#f59e0b';ctx.font='700 42px Archivo,sans-serif';ctx.fillText('@'+me.instagram.replace('@',''),540,1250);}
+    ctx.font='900 90px Archivo,sans-serif';ctx.fillStyle='#fff';ctx.fillText('TOKYO',540,1560);
+    const mg=ctx.createLinearGradient(340,1600,740,1680);mg.addColorStop(0,'#fd267a');mg.addColorStop(1,'#ff6036');ctx.fillStyle=mg;ctx.fillText('MATCH',540,1660);
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='600 38px Archivo,sans-serif';ctx.fillText('Dá match comigo na festa 🔥',540,1780);
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='500 32px Archivo,sans-serif';ctx.fillText('matchbaile.vercel.app',540,1840);
+    cv.toBlob(async blob=>{
+      const file=new File([blob],'tokyo-match.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Tokyo Match',text:'Dá match comigo na festa! 🔥 matchbaile.vercel.app'});}catch(e){}
+      }else{
+        const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='tokyo-match.png';a.click();URL.revokeObjectURL(url);
+        toast('Imagem baixada! Poste nos stories 🔥');
+      }
+    },'image/png');
+  }catch(e){toast('Erro ao gerar. A foto precisa carregar pelo CDN.')}
+}
 function renderEditPhotos(){const photos=getPhotos(me);const g=$('#ep-grid');let h='';for(let i=0;i<Math.max(photos.length,1);i++){const url=photos[i];const c=i===0?'photo-slot main':'photo-slot';if(url)h+=`<div class="${c}"><img src="${esc(url)}" loading="lazy"><div class="remove" onclick="removeEditPhoto(${i})">✕</div></div>`;else h+=`<div class="${c}" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`}if(photos.length<6&&photos.length>0)h+=`<div class="photo-slot" onclick="$('#ep-file').click()">${ic2('plus',28,1.5)}</div>`;g.innerHTML=h}
 function removeEditPhoto(i){const photos=getPhotos(me);photos.splice(i,1);me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos()}
 async function addEditPhotos(e){const files=[...e.target.files];const photos=getPhotos(me);if(photos.length+files.length>6){toast('Máximo 6 fotos!');return}toast('Enviando fotos…');const{data:{user}}=await sb.auth.getUser();for(const f of files){const webp=await toWebP(f);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error){toast('Erro: '+error.message);continue}photos.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}me.photos=photos;me.photo_url=photos[0]||'';renderEditPhotos();toast('Fotos adicionadas! ✓')}

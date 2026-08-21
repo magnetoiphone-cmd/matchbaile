@@ -188,6 +188,14 @@ img[loading=lazy]{content-visibility:auto}
 .mini.no{color:var(--tinder1);border-color:var(--tinder1)}
 
 /* ---- likes section ---- */
+/* ---- likes teaser (mistério) ---- */
+.likes-teaser{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(253,38,122,.12),rgba(255,96,54,.06));border:1px solid rgba(253,38,122,.25);border-radius:18px;padding:16px;margin-bottom:16px;cursor:pointer;animation:fadeUp .4s ease;transition:transform .15s;position:relative;overflow:hidden}
+.likes-teaser::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,rgba(253,38,122,.15),transparent 60%);pointer-events:none}
+.likes-teaser:active{transform:scale(.98)}
+.likes-teaser .lt-icon{width:52px;height:52px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 16px rgba(253,38,122,.35);animation:pulse2 2s infinite}
+.likes-teaser .lt-text{flex:1;position:relative;z-index:1}
+.likes-teaser .lt-text b{display:block;font-size:16px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.likes-teaser .lt-text span{font-size:12px;color:var(--dim)}
 .likes-scroll{display:flex;gap:10px;overflow-x:auto;padding:8px 0;margin-bottom:14px;scrollbar-width:none}
 .likes-scroll::-webkit-scrollbar{display:none}
 .like-bubble{flex-shrink:0;text-align:center;width:72px;cursor:pointer;animation:fadeIn .4s ease both}
@@ -714,7 +722,7 @@ function showMatchOv(p){spawnConfetti();const ov=document.createElement('div');o
 
 /* ============ MATCHES ============ */
 async function showMatches(){globalMsgCount=0;const chatBtn=document.querySelector('nav button[data-t="matches"]');if(chatBtn){const b=chatBtn.querySelector('.badge');if(b)b.remove()}const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="matchview"><p class="sub pulse">Carregando…</p></div>`;const[a,b,lm]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('messages').select('*').or(`sender.eq.${me.id},receiver.eq.${me.id}`).order('created_at',{ascending:false})]);const iLiked=new Set((a.data||[]).map(x=>x.liked));const whoLikedMe=(b.data||[]).filter(x=>!iLiked.has(x.liker));const matchIds=(b.data||[]).map(x=>x.liker).filter(id=>iLiked.has(id));const allIds=[...new Set([...matchIds,...whoLikedMe.map(x=>x.liker)])];const{data:profs}=allIds.length?await sb.from('profiles').select('*').in('id',allIds):{data:[]};const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p);const msgs=lm.data||[];const lastMsg={};msgs.forEach(m=>{const o=m.sender===me.id?m.receiver:m.sender;if(!lastMsg[o])lastMsg[o]=m});const mv=$('#matchview');let h='';
-  if(whoLikedMe.length){h+=`<label>Quem curtiu você 💗</label><div class="likes-scroll">`;whoLikedMe.forEach(l=>{const p=profMap[l.liker];if(!p)return;h+=`<div class="like-bubble ${l.is_super?'is-super':''} ${p.at_party?'at-party':''}" onclick="showProfileOverlay('${l.liker}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120)}<p>${esc(p.name)}</p></div>`});h+=`</div>`}
+  if(whoLikedMe.length){const superCount=whoLikedMe.filter(l=>l.is_super).length;h+=`<div class="likes-teaser" onclick="toast('Continue dando like pra descobrir quem é! 👀')"><div class="lt-icon">${ic2('flame',28)}</div><div class="lt-text"><b>${whoLikedMe.length} pessoa${whoLikedMe.length>1?'s':''} curtiu você!</b><span>${superCount>0?`⭐ ${superCount} Super Like${superCount>1?'s':''} · `:''}Dá match pra descobrir quem 👀</span></div></div>`}
   const newMatches=matchIds.filter(id=>!lastMsg[id]);
   const activeChats=matchIds.filter(id=>lastMsg[id]);
   if(newMatches.length){h+=`<label>Novos matches 🔥</label>`;newMatches.forEach(id=>{const p=profMap[id];if(!p)return;const dot=p.at_party?'<div class="online-dot"></div>':'';const pw=p.at_party?' at-party':'';h+=`<div class="swipe-row" data-id="${id}"><div class="row new-match" onclick="openChat('${id}')"><div class="img-wrap${pw}" onclick="event.stopPropagation();showProfileOverlay('${id}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120,true)}${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>Diz oi! 👋</span></div></div><div class="swipe-actions"><button class="sw-profile" onclick="showProfileOverlay('${id}')">${ic2('user',14)} Perfil</button><button class="sw-delete" onclick="deleteConvo('${id}','${esc(p.name)}')">${ic2('x',14)} Excluir</button></div></div>`})}

@@ -17,7 +17,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tokyo Match">
 <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <!-- Preview WhatsApp / Instagram / Redes Sociais -->
 <meta property="og:type" content="website">
@@ -889,11 +888,11 @@ async function shareProfile(){
   try{
     const img=new Image();img.crossOrigin='anonymous';
     await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=thumb(photoUrl,800)});
-    // Gera QR code
+    // Gera QR code via API (mais confiável que lib JS)
     let qrImg=null;
     try{
-      const qrDataUrl=await QRCode.toDataURL('https://matchbaile.vercel.app',{width:280,margin:1,color:{dark:'#000000',light:'#ffffff'}});
-      qrImg=new Image();await new Promise((res,rej)=>{qrImg.onload=res;qrImg.onerror=rej;qrImg.src=qrDataUrl});
+      qrImg=new Image();qrImg.crossOrigin='anonymous';
+      await new Promise((res,rej)=>{qrImg.onload=res;qrImg.onerror=rej;qrImg.src='https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=0&data='+encodeURIComponent('https://matchbaile.vercel.app')});
     }catch(e){qrImg=null}
     const cv=document.createElement('canvas');cv.width=1080;cv.height=1920;const ctx=cv.getContext('2d');
     const bg=ctx.createLinearGradient(0,0,1080,1920);bg.addColorStop(0,'#1a0a12');bg.addColorStop(.5,'#08080c');bg.addColorStop(1,'#1a0f08');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);

@@ -17,6 +17,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tokyo Match">
 <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <!-- Preview WhatsApp / Instagram / Redes Sociais -->
 <meta property="og:type" content="website">
@@ -888,20 +889,34 @@ async function shareProfile(){
   try{
     const img=new Image();img.crossOrigin='anonymous';
     await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=thumb(photoUrl,800)});
+    // Gera QR code
+    let qrImg=null;
+    try{
+      const qrDataUrl=await QRCode.toDataURL('https://matchbaile.vercel.app',{width:280,margin:1,color:{dark:'#000000',light:'#ffffff'}});
+      qrImg=new Image();await new Promise((res,rej)=>{qrImg.onload=res;qrImg.onerror=rej;qrImg.src=qrDataUrl});
+    }catch(e){qrImg=null}
     const cv=document.createElement('canvas');cv.width=1080;cv.height=1920;const ctx=cv.getContext('2d');
     const bg=ctx.createLinearGradient(0,0,1080,1920);bg.addColorStop(0,'#1a0a12');bg.addColorStop(.5,'#08080c');bg.addColorStop(1,'#1a0f08');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
-    const glow=ctx.createRadialGradient(540,300,0,540,300,700);glow.addColorStop(0,'rgba(253,38,122,.25)');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,1000);
-    const size=560,cx=540,cy=760;
+    const glow=ctx.createRadialGradient(540,280,0,540,280,700);glow.addColorStop(0,'rgba(253,38,122,.25)');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,1000);
+    const size=520,cx=540,cy=680;
     ctx.save();ctx.beginPath();ctx.arc(cx,cy,size/2,0,Math.PI*2);ctx.closePath();ctx.clip();
     const ar=img.width/img.height;let dw=size,dh=size,dx=cx-size/2,dy=cy-size/2;if(ar>1){dh=size;dw=size*ar;dx=cx-dw/2}else{dw=size;dh=size/ar;dy=cy-dh/2}
     ctx.drawImage(img,dx,dy,dw,dh);ctx.restore();
     ctx.lineWidth=10;const bgrad=ctx.createLinearGradient(cx-size/2,cy-size/2,cx+size/2,cy+size/2);bgrad.addColorStop(0,'#fd267a');bgrad.addColorStop(1,'#ff8c00');ctx.strokeStyle=bgrad;ctx.beginPath();ctx.arc(cx,cy,size/2,0,Math.PI*2);ctx.stroke();
-    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 76px Archivo,sans-serif';ctx.fillText(`${me.name}, ${me.age||''}`,540,1180);
-    if(me.instagram){ctx.fillStyle='#f59e0b';ctx.font='700 42px Archivo,sans-serif';ctx.fillText('@'+me.instagram.replace('@',''),540,1250);}
-    ctx.font='900 90px Archivo,sans-serif';ctx.fillStyle='#fff';ctx.fillText('TOKYO',540,1560);
-    const mg=ctx.createLinearGradient(340,1600,740,1680);mg.addColorStop(0,'#fd267a');mg.addColorStop(1,'#ff6036');ctx.fillStyle=mg;ctx.fillText('MATCH',540,1660);
-    ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='600 38px Archivo,sans-serif';ctx.fillText('Dá match comigo na festa 🔥',540,1780);
-    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='500 32px Archivo,sans-serif';ctx.fillText('matchbaile.vercel.app',540,1840);
+    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 72px Archivo,sans-serif';ctx.fillText(`${me.name}, ${me.age||''}`,540,1050);
+    if(me.instagram){ctx.fillStyle='#f59e0b';ctx.font='700 40px Archivo,sans-serif';ctx.fillText('@'+me.instagram.replace('@',''),540,1115);}
+    ctx.font='900 78px Archivo,sans-serif';ctx.fillStyle='#fff';ctx.fillText('TOKYO',540,1300);
+    const mg=ctx.createLinearGradient(360,1330,720,1400);mg.addColorStop(0,'#fd267a');mg.addColorStop(1,'#ff6036');ctx.fillStyle=mg;ctx.fillText('MATCH',540,1385);
+    // QR code com moldura branca
+    if(qrImg){
+      const qs=280,qx=540-qs/2,qy=1460;
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(qx-16,qy-16,qs+32,qs+32,20);ctx.fill();
+      ctx.drawImage(qrImg,qx,qy,qs,qs);
+      ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='600 34px Archivo,sans-serif';ctx.fillText('Aponta a câmera e dá match! 🔥',540,1820);
+    }else{
+      ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='600 38px Archivo,sans-serif';ctx.fillText('Dá match comigo na festa 🔥',540,1560);
+      ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='500 32px Archivo,sans-serif';ctx.fillText('matchbaile.vercel.app',540,1620);
+    }
     cv.toBlob(async blob=>{
       const file=new File([blob],'tokyo-match.png',{type:'image/png'});
       if(navigator.canShare&&navigator.canShare({files:[file]})){

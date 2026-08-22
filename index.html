@@ -281,6 +281,10 @@ img[loading=lazy]{content-visibility:auto}
 .raffle-hero{text-align:center;margin-bottom:20px;animation:fadeUp .4s ease}
 .flyer-preview{width:100%;border-radius:16px;overflow:hidden;margin-bottom:18px;box-shadow:0 8px 30px rgba(0,0,0,.5);border:1px solid var(--line);animation:fadeUp .4s ease}
 .flyer-preview img{width:100%;display:block}
+.copy-link{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.copy-link span{flex:1;font-size:13px;color:var(--neon-amber);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-link button{background:var(--grad);border:none;color:#fff;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.copy-link button:active{transform:scale(.88)}
 .raffle-hero .rh-icon{font-size:56px;animation:pulse2 2s infinite}
 .raffle-hero h2{font-size:26px;font-weight:900;margin-top:6px}
 .prizes{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
@@ -996,7 +1000,12 @@ async function showSorteio(){
   </div>`;
   h+=`<label>Como participar</label>
   <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'1'}</div><div class="si-text"><b>Compartilhe o flyer no seu story</b><span>Toque no botão abaixo e poste no Instagram</span></div></div>
-  <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'2'}</div><div class="si-text"><b>Marque @tokyo.producoes no story</b><span>Pra gente confirmar sua participação</span></div></div>`;
+  <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'2'}</div><div class="si-text"><b>Cole o link do evento no story</b><span>Use o sticker de link 🔗 do Instagram</span></div></div>
+  <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'3'}</div><div class="si-text"><b>Marque @tokyo.producoes no story</b><span>Pra gente confirmar sua participação</span></div></div>`;
+  // Link copiável
+  if(flyer.event_link){
+    h+=`<label>Link do evento (cole no seu story)</label><div class="copy-link"><span id="evt-link">${esc(flyer.event_link)}</span><button onclick="copyEventLink('${esc(flyer.event_link)}')">${ic2('clipboard',16)}</button></div>`;
+  }
   if(shared){
     h+=`<div class="raffle-status in"><div class="rs-icon">🎉</div><b>Você está concorrendo!</b><span>Sorteio toda sexta às 20h. Boa sorte! 🍀</span></div>`;
     h+=`<button class="btn ghost" onclick="shareRaffleFlyer()" style="margin-top:10px">${ic2('share',16)} Compartilhar de novo</button>`;
@@ -1008,6 +1017,11 @@ async function showSorteio(){
     winners.forEach(w=>{const p=w.profiles;const medal=w.position===1?'🥇':w.position===2?'🥈':'🥉';h+=`<div class="winner-row">${medal} ${optimImg(getPhotos(p||{})[0]||(p&&p.photo_url)||'','',80)}<div class="wr-info"><b>${esc(p?p.name:'?')}</b><span>${esc(w.prize)}</span></div></div>`});
   }
   rv.innerHTML=h;
+}
+
+async function copyEventLink(link){
+  try{await navigator.clipboard.writeText(link);toast('Link copiado! Cole no seu story 🔗')}
+  catch(e){toast('Não foi possível copiar. Link: '+link)}
 }
 
 async function joinRaffle(){
@@ -1242,6 +1256,7 @@ async function loadAdminRaffle(){
   if(flyer){h+=`<div class="flyer-preview" style="max-width:200px;margin:0 auto 10px"><img src="${esc(flyer.flyer_url)}"></div>`}
   h+=`<input type="file" id="flyer-file" accept="image/*" class="hidden"><button class="btn ghost sm" onclick="$('#flyer-file').click()" style="margin:0 auto 10px;display:block">${ic2('image-plus',14)} ${flyer?'Trocar flyer':'Subir flyer'}</button>`;
   h+=`<label>Link do evento</label><input id="flyer-link" placeholder="https://..." value="${flyer&&flyer.event_link?esc(flyer.event_link):''}"><button class="btn sm" onclick="saveFlyerLink()" style="margin-top:8px">${ic2('check',14)} Salvar link</button>`;
+  if(flyer){h+=`<button class="btn ghost sm" onclick="deleteFlyer()" style="margin-top:8px;border-color:var(--tinder1);color:var(--tinder1);display:block">${ic2('x',14)} Excluir sorteio da semana</button>`}
   // Sorteio
   h+=`<label style="margin-top:20px">Sorteio</label>`;
   if(winners.length){
@@ -1284,6 +1299,15 @@ async function saveFlyerLink(){
   const{error}=await sb.from('raffle_flyer').update({event_link:link}).eq('raffle_week',week);
   if(error){toast('Erro: '+traduzir(error.message));return}
   toast('Link salvo! ✓');
+}
+
+async function deleteFlyer(){
+  if(!confirm('Excluir o sorteio dessa semana? O flyer, link e participações serão removidos.'))return;
+  const week=getRaffleWeek();
+  await sb.from('raffle_flyer').delete().eq('raffle_week',week);
+  await sb.from('raffle_entries').delete().eq('raffle_week',week);
+  await sb.from('raffle_winners').delete().eq('raffle_week',week);
+  toast('Sorteio da semana excluído.');loadAdminRaffle();
 }
 
 async function drawRaffle(){

@@ -686,7 +686,11 @@ async function showSwipe(){const s=$('#screen');s.className='screen-enter';
       <button class="${swipeFilter==='festa'?'active':''}" onclick="swipeFilter='festa';showSwipe()">${ic2('map-pin',14)} Na festa agora</button>
     </div>`:''}
     <div id="deck-area"><div class="empty"><div class="big pulse">🔥</div></div></div>`;
-  const[lr,lmr,pr]=await Promise.all([sb.from('likes').select('liked').eq('liker',me.id),sb.from('likes').select('liker,is_super').eq('liked',me.id),sb.from('profiles').select('*').eq('status','approved').eq('visible',true).neq('id',me.id)]);
+  const[lr,lmr,pr]=await Promise.all([
+    sb.from('likes').select('liked').eq('liker',me.id),
+    sb.from('likes').select('liker,is_super').eq('liked',me.id),
+    sb.from('profiles').select('id,name,age,instagram,bio,photo_url,photos,gender,at_party').eq('status','approved').eq('visible',true).neq('id',me.id)
+  ]);
   myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));
   let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));
   if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');
@@ -704,7 +708,16 @@ async function showSwipe(){const s=$('#screen');s.className='screen-enter';
     if(aL!==bL)return bL-aL;
     return Math.random()-.5;
   });
-  deck=filtered;renderDeck()}
+  deck=filtered;renderDeck();preloadDeckImages()}
+
+function preloadDeckImages(){
+  // Pré-carrega as fotos das próximas 3 pessoas do deck
+  for(let i=1;i<=3;i++){
+    const p=deck[i];if(!p)continue;
+    const photos=getPhotos(p);
+    photos.slice(0,2).forEach(url=>{const img=new Image();img.src=thumb(url,600)});
+  }
+}
 
 async function toggleCheckIn(){
   const newVal=!me.at_party;

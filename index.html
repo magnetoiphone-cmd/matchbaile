@@ -946,6 +946,20 @@ async function showRanking(){
 /* ============ PERFIL ============ */
 function getRaffleWeek(){const d=new Date();const start=new Date(d.getFullYear(),0,1);const days=Math.floor((d-start)/86400000);const week=Math.ceil((days+start.getDay()+1)/7);return`${d.getFullYear()}-W${String(week).padStart(2,'0')}`}
 
+function getWeekLabel(){
+  // Retorna algo tipo "18 a 24 de agosto"
+  const d=new Date();
+  const day=d.getDay();
+  const diff=day===0?-6:1-day; // segunda da semana
+  const mon=new Date(d);mon.setDate(d.getDate()+diff);
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+  const meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  if(mon.getMonth()===sun.getMonth()){
+    return `${mon.getDate()} a ${sun.getDate()} de ${meses[mon.getMonth()]}`;
+  }
+  return `${mon.getDate()} ${meses[mon.getMonth()]} a ${sun.getDate()} ${meses[sun.getMonth()]}`;
+}
+
 async function showSorteio(){
   const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="raffleview"><p class="sub pulse">Carregando…</p></div>`;
   const week=getRaffleWeek();
@@ -1222,7 +1236,7 @@ async function loadAdminRaffle(){
   const entries=entriesRes.data||[];
   const winners=winnersRes.data||[];
   const flyer=flyerRes.data;
-  let h=`<div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">🎁 Sorteio ${week}</h2><p class="sub"><b style="color:var(--neon-green)">${entries.length}</b> pessoa${entries.length!==1?'s':''} participando</p></div>`;
+  let h=`<div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">🎁 Sorteio da Semana</h2><p class="sub" style="margin-top:2px">${getWeekLabel()}</p><p class="sub"><b style="color:var(--neon-green)">${entries.length}</b> pessoa${entries.length!==1?'s':''} participando</p></div>`;
   // Flyer da semana
   h+=`<label>Flyer da semana (story)</label>`;
   if(flyer){h+=`<div class="flyer-preview" style="max-width:200px;margin:0 auto 10px"><img src="${esc(flyer.flyer_url)}"></div>`}

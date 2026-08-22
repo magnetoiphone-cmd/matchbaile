@@ -272,6 +272,41 @@ img[loading=lazy]{content-visibility:auto}
 /* ---- date separator ---- */
 .msg-date{text-align:center;color:var(--dim);font-size:11px;font-weight:600;margin:14px 0 8px;letter-spacing:.5px}
 
+/* ---- sorteio ---- */
+.winner-banner{text-align:center;padding:24px 20px;border-radius:20px;margin-bottom:20px;background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(253,38,122,.1));border:2px solid rgba(255,215,0,.4);box-shadow:0 0 30px rgba(255,215,0,.2);animation:matchBounce .6s cubic-bezier(.34,1.56,.64,1)}
+.winner-banner .wb-medal{font-size:64px;animation:pulse2 1.5s infinite}
+.winner-banner h2{font-size:28px;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:4px 0}
+.winner-banner p{font-size:18px;font-weight:700;color:#fff}
+.winner-banner .wb-hint{display:block;font-size:12px;color:var(--dim);margin-top:10px}
+.raffle-hero{text-align:center;margin-bottom:20px;animation:fadeUp .4s ease}
+.flyer-preview{width:100%;border-radius:16px;overflow:hidden;margin-bottom:18px;box-shadow:0 8px 30px rgba(0,0,0,.5);border:1px solid var(--line);animation:fadeUp .4s ease}
+.flyer-preview img{width:100%;display:block}
+.raffle-hero .rh-icon{font-size:56px;animation:pulse2 2s infinite}
+.raffle-hero h2{font-size:26px;font-weight:900;margin-top:6px}
+.prizes{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.prize-card{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;animation:fadeUp .4s ease both}
+.prize-card.p1{background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(255,215,0,.04));border:1px solid rgba(255,215,0,.3)}
+.prize-card.p2{background:linear-gradient(135deg,rgba(192,192,192,.12),rgba(192,192,192,.03));border:1px solid rgba(192,192,192,.25)}
+.prize-card.p3{background:linear-gradient(135deg,rgba(205,127,50,.12),rgba(205,127,50,.03));border:1px solid rgba(205,127,50,.25)}
+.prize-card .pz-medal{font-size:32px;flex-shrink:0}
+.prize-card .pz-info b{display:block;font-size:15px;font-weight:800}
+.prize-card .pz-info span{font-size:13px;color:var(--dim)}
+.step-item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:8px;transition:all .3s;animation:fadeUp .4s ease both}
+.step-item.done{border-color:var(--neon-green);background:rgba(52,211,153,.06)}
+.step-item .si-num{width:32px;height:32px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.step-item.done .si-num{background:var(--neon-green);color:#000}
+.step-item .si-text b{display:block;font-size:14px;font-weight:700}
+.step-item .si-text span{font-size:12px;color:var(--dim)}
+.raffle-status{text-align:center;padding:20px;border-radius:16px;margin-top:16px;animation:matchBounce .5s cubic-bezier(.34,1.56,.64,1)}
+.raffle-status.in{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(52,211,153,.04));border:1px solid var(--neon-green)}
+.raffle-status .rs-icon{font-size:40px}
+.raffle-status b{display:block;font-size:18px;font-weight:800;color:var(--neon-green);margin-top:6px}
+.raffle-status span{font-size:13px;color:var(--dim)}
+.winner-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;font-size:22px;animation:fadeUp .4s ease both}
+.winner-row img{width:44px;height:44px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+.winner-row .wr-info b{display:block;font-size:15px;font-weight:700}
+.winner-row .wr-info span{font-size:12px;color:var(--neon-amber)}
+
 /* ---- nav ---- */
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:2px;background:rgba(8,8,12,.85);border-top:1px solid rgba(255,255,255,.06);padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:40;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 nav button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:600;font-size:12px;padding:10px 14px;border-radius:20px;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:5px;flex:1;justify-content:center}
@@ -322,8 +357,8 @@ nav button.on svg{stroke:var(--tinder2)}
 .admin-msg-bubble{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:4px;margin-left:44px;font-size:13px;line-height:1.4}
 .admin-msg-bubble.has-img img{max-width:200px;border-radius:10px;cursor:pointer}
 .admin-msg-bubble .meta{font-size:10px;color:var(--dim);margin-top:4px}
-.admin-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
-.admin-tabs button{white-space:nowrap;min-height:42px}
+.admin-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.admin-tabs button{white-space:nowrap;min-height:42px;font-size:12px;padding:8px 6px}
 .event-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:10px;animation:fadeUp .3s ease}
 .event-card.active{border-color:var(--neon-green);box-shadow:0 0 14px rgba(43,255,111,.15)}
 .event-card h3{font-size:16px;font-weight:800;margin-bottom:4px}
@@ -499,7 +534,9 @@ function ic2(name,size=20,sw=2){
     'eye':`<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>`,
     'users':`<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
     'clipboard':`<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>`,
-    'map-pin':`<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`
+    'map-pin':`<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`,
+    'gift':`<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>`,
+    'share':`<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>`
   };
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${i[name]||''}</svg>`;
 }
@@ -560,7 +597,7 @@ function removeSetupPhoto(i){setupPhotos.splice(i,1);renderPhotoGrid()}
 async function submitProfile(){const name=$('#f-name').value.trim(),age=parseInt($('#f-age').value),gender=$('#f-gender').value;if(!name){toast('Coloca teu nome!');return}if(!age||age<18){toast('Festa é 18+ 😉');return}if(!gender){toast('Seleciona teu gênero!');return}if(!setupPhotos.length){toast('Adiciona pelo menos 1 foto!');return}const btn=$('#f-go');btn.disabled=true;btn.textContent='Enviando…';try{const{data:{user}}=await sb.auth.getUser();const photoUrls=[];for(const p of setupPhotos){const webp=await toWebP(p.file);const path=`${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,6)}.webp`;const{error}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});if(error)throw error;photoUrls.push(sb.storage.from('fotos').getPublicUrl(path).data.publicUrl)}const ins=await sb.from('profiles').insert({id:user.id,name,age,instagram:$('#f-ig').value.trim(),bio:$('#f-bio').value.trim(),gender,preference:$('#f-pref').value,photo_url:photoUrls[0],photos:photoUrls,status:'approved'}).select().single();if(ins.error)throw ins.error;me=ins.data;render()}catch(e){toast(traduzir(e.message||''));btn.disabled=false;btn.textContent='Criar perfil'}}
 
 /* ============ RENDER ============ */
-function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
+function render(){if(!me){showLogin();return}if(me.status==='banned'){showBanned();return}buildNav();if(tab==='swipe')showSwipe();else if(tab==='matches')showMatches();else if(tab==='ranking')showRanking();else if(tab==='sorteio')showSorteio();else if(tab==='perfil')showPerfil();else if(tab==='admin')showAdmin()}
 function showBanned(){$('#nav').classList.add('hidden');const s=$('#screen');s.className='empty screen-enter';s.innerHTML=`<div class="big">🚫</div><h2>Conta suspensa</h2><p class="sub">Sua conta foi suspensa pela organização da festa. Entre em contato se achar que foi um engano.</p><button class="link-btn" onclick="doLogout()">Sair</button>`}
 async function recheck(){const{data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(data)me=data;render()}
 async function doLogout(){if(chatSub)chatSub.unsubscribe();if(window._globalSub)window._globalSub.unsubscribe();cache.clear();await sb.auth.signOut();me=null;showLogin()}
@@ -612,7 +649,7 @@ function updateChatBadge(){
   }
 }
 
-function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">${ic2('flame',16)} Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">${ic2('message-circle',16)} Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">${ic2('trophy',16)} Top</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">${ic2('user',16)} Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">${ic2('shield',16)}<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
+function buildNav(){const n=$('#nav');n.classList.remove('hidden');n.innerHTML=`<button data-t="swipe" class="${tab==='swipe'?'on':''}">${ic2('flame',16)} Pista</button><button data-t="matches" class="${tab==='matches'?'on':''}">${ic2('message-circle',16)} Chat</button><button data-t="ranking" class="${tab==='ranking'?'on':''}">${ic2('trophy',16)} Top</button><button data-t="sorteio" class="${tab==='sorteio'?'on':''}">${ic2('gift',16)} Sorteio</button><button data-t="perfil" class="${tab==='perfil'?'on':''}">${ic2('user',16)} Perfil</button>${me.is_admin?`<button data-t="admin" class="${tab==='admin'?'on':''}">${ic2('shield',16)}<span id="pend-badge"></span></button>`:''}`;n.querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});if(me.is_admin)updatePendingBadge()}
 async function updatePendingBadge(){const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('visible',false).eq('status','approved');const el=$('#pend-badge');if(el&&count)el.innerHTML=`<span class="badge">${count}</span>`}
 
 /* ============ SWIPE ============ */
@@ -907,6 +944,88 @@ async function showRanking(){
 }
 
 /* ============ PERFIL ============ */
+function getRaffleWeek(){const d=new Date();const start=new Date(d.getFullYear(),0,1);const days=Math.floor((d-start)/86400000);const week=Math.ceil((days+start.getDay()+1)/7);return`${d.getFullYear()}-W${String(week).padStart(2,'0')}`}
+
+async function showSorteio(){
+  const s=$('#screen');s.className='screen-enter';s.innerHTML=`<div id="raffleview"><p class="sub pulse">Carregando…</p></div>`;
+  const week=getRaffleWeek();
+  const[entryRes,winnersRes,flyerRes]=await Promise.all([
+    sb.from('raffle_entries').select('*').eq('user_id',me.id).eq('raffle_week',week).maybeSingle(),
+    sb.from('raffle_winners').select('*, profiles(name,photo_url,photos)').order('position',{ascending:true}),
+    sb.from('raffle_flyer').select('*').eq('raffle_week',week).maybeSingle()
+  ]);
+  const entry=entryRes.data;
+  const shared=entry&&entry.shared;
+  const winners=winnersRes.data||[];
+  const flyer=flyerRes.data;
+  window._currentFlyer=flyer;
+  const rv=$('#raffleview');
+  // Verifica se EU sou ganhador
+  const myWin=winners.find(w=>w.user_id===me.id);
+  let h=`<div class="raffle-hero"><div class="rh-icon">🎁</div><h2>Sorteio Semanal</h2><p class="sub">Compartilhe e concorra a prêmios toda semana!</p></div>`;
+  // Card de ganhador
+  if(myWin){
+    const medal=myWin.position===1?'🥇':myWin.position===2?'🥈':'🥉';
+    const msg=encodeURIComponent(`Oi! Sou o ganhador do ${myWin.position}º prêmio do sorteio Tokyo Match: ${myWin.prize} 🎉 Meu nome é ${me.name}${me.instagram?' (@'+me.instagram.replace('@','')+')':''}`);
+    h+=`<div class="winner-banner"><div class="wb-medal">${medal}</div><h2>VOCÊ GANHOU!</h2><p>${esc(myWin.prize)}</p><a href="https://wa.me/5595991191283?text=${msg}" target="_blank" class="btn" style="margin-top:14px;text-decoration:none;display:flex">${ic2('message-circle',18)} Resgatar no WhatsApp</a><span class="wb-hint">Clique acima e mande a mensagem pra resgatar seu prêmio!</span></div>`;
+  }
+  if(!flyer){
+    h+=`<div class="raffle-status" style="background:var(--card);border:1px solid var(--line)"><div class="rs-icon">⏳</div><b style="color:var(--neon-amber)">Sorteio em breve!</b><span>O sorteio dessa semana ainda não começou. Volta logo!</span></div>`;
+    if(winners.length){h+=`<label style="margin-top:24px">🏆 Últimos ganhadores</label>`;winners.forEach(w=>{const p=w.profiles;const medal=w.position===1?'🥇':w.position===2?'🥈':'🥉';h+=`<div class="winner-row">${medal} ${optimImg(getPhotos(p||{})[0]||(p&&p.photo_url)||'','',80)}<div class="wr-info"><b>${esc(p?p.name:'?')}</b><span>${esc(w.prize)}</span></div></div>`})}
+    rv.innerHTML=h;return;
+  }
+  h+=`<div class="flyer-preview"><img src="${esc(flyer.flyer_url)}" alt="Flyer"></div>`;
+  h+=`<div class="prizes">
+    <div class="prize-card p1"><div class="pz-medal">🥇</div><div class="pz-info"><b>1º Lugar</b><span>Camarote Fechado</span></div></div>
+    <div class="prize-card p2"><div class="pz-medal">🥈</div><div class="pz-info"><b>2º Lugar</b><span>Combo Gin Rocks</span></div></div>
+    <div class="prize-card p3"><div class="pz-medal">🥉</div><div class="pz-info"><b>3º Lugar</b><span>5 Entradas Lounge</span></div></div>
+  </div>`;
+  h+=`<label>Como participar</label>
+  <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'1'}</div><div class="si-text"><b>Compartilhe o flyer no seu story</b><span>Toque no botão abaixo e poste no Instagram</span></div></div>
+  <div class="step-item ${shared?'done':''}"><div class="si-num">${shared?'✓':'2'}</div><div class="si-text"><b>Marque @tokyo.producoes no story</b><span>Pra gente confirmar sua participação</span></div></div>`;
+  if(shared){
+    h+=`<div class="raffle-status in"><div class="rs-icon">🎉</div><b>Você está concorrendo!</b><span>Sorteio toda sexta às 20h. Boa sorte! 🍀</span></div>`;
+    h+=`<button class="btn ghost" onclick="shareRaffleFlyer()" style="margin-top:10px">${ic2('share',16)} Compartilhar de novo</button>`;
+  }else{
+    h+=`<p class="sub" style="text-align:center;margin-top:10px">⏰ Sorteio toda sexta às 20h</p><button class="btn" onclick="joinRaffle()" style="margin-top:8px">${ic2('share',16)} Compartilhar e participar</button>`;
+  }
+  if(winners.length){
+    h+=`<label style="margin-top:24px">🏆 Últimos ganhadores</label>`;
+    winners.forEach(w=>{const p=w.profiles;const medal=w.position===1?'🥇':w.position===2?'🥈':'🥉';h+=`<div class="winner-row">${medal} ${optimImg(getPhotos(p||{})[0]||(p&&p.photo_url)||'','',80)}<div class="wr-info"><b>${esc(p?p.name:'?')}</b><span>${esc(w.prize)}</span></div></div>`});
+  }
+  rv.innerHTML=h;
+}
+
+async function joinRaffle(){
+  const week=getRaffleWeek();
+  await shareRaffleFlyer();
+  const{error}=await sb.from('raffle_entries').upsert({user_id:me.id,raffle_week:week,shared:true},{onConflict:'user_id,raffle_week'});
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Participação confirmada! Boa sorte! 🍀');
+  setTimeout(showSorteio,1500);
+}
+
+async function shareRaffleFlyer(){
+  const flyer=window._currentFlyer;
+  if(!flyer){toast('Flyer não disponível.');return}
+  try{
+    const img=new Image();img.crossOrigin='anonymous';
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=flyer.flyer_url});
+    const cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;const ctx=cv.getContext('2d');ctx.drawImage(img,0,0);
+    const linkText=flyer.event_link?`\n🎟 ${flyer.event_link}`:'';
+    await new Promise(res=>cv.toBlob(async blob=>{
+      const file=new File([blob],'sorteio-tokyo-match.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Sorteio Tokyo Match',text:`Tô concorrendo no sorteio do Tokyo Match! 🎁🔥 Marca @tokyo.producoes${linkText}`})}catch(e){}
+      }else{
+        const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='sorteio-tokyo-match.png';a.click();URL.revokeObjectURL(url);
+        toast('Flyer baixado! Poste no story 🔥');
+      }
+      res();
+    },'image/png'));
+  }catch(e){toast('Erro ao carregar o flyer.')}
+}
+
 function showPerfil(){const photos=getPhotos(me);const s=$('#screen');s.className='screen-enter';s.innerHTML=`<h2>Meu perfil</h2><div class="photo-grid" id="ep-grid"></div><input type="file" id="ep-file" accept="image/*" multiple class="hidden"><button class="btn ghost sm" onclick="$('#ep-file').click()" style="margin:0 auto;display:block">${ic2('image-plus',16)} Adicionar fotos</button><label>Nome</label><input id="e-name" value="${esc(me.name)}" maxlength="40"><label>Idade</label><input id="e-age" type="number" value="${me.age||''}" min="18" max="99"><label>Instagram</label><input id="e-ig" value="${esc(me.instagram||'')}" maxlength="40"><label>Gênero</label><select id="e-gender"><option value="homem" ${me.gender==='homem'?'selected':''}>Homem</option><option value="mulher" ${me.gender==='mulher'?'selected':''}>Mulher</option><option value="outro" ${me.gender==='outro'?'selected':''}>Outro</option></select><label>Quero ver</label><select id="e-pref"><option value="todos" ${me.preference==='todos'?'selected':''}>Todos</option><option value="homens" ${me.preference==='homens'?'selected':''}>Homens</option><option value="mulheres" ${me.preference==='mulheres'?'selected':''}>Mulheres</option></select><label>Bio</label><textarea id="e-bio" maxlength="160">${esc(me.bio)}</textarea><button class="btn" onclick="saveProfile()">Salvar alterações</button><button class="btn ghost" style="margin-top:10px" onclick="shareProfile()">${ic2('send',16)} Compartilhar no Stories</button><button class="btn ghost" style="margin-top:10px" onclick="doLogout()">${ic2('log-out',16)} Sair da conta</button>`;renderEditPhotos();$('#ep-file').onchange=addEditPhotos}
 
 async function shareProfile(){
@@ -969,11 +1088,13 @@ async function showAdmin(){
     <div class="admin-tabs">
       <button class="btn sm ${adminTab==='pending'?'':'ghost'}" onclick="adminTab='pending';showAdmin()" style="flex:1">${ic2("clipboard",14)} Aprovar</button>
       <button class="btn sm ${adminTab==='events'?'':'ghost'}" onclick="adminTab='events';showAdmin()" style="flex:1">🎉 Festas</button>
+      <button class="btn sm ${adminTab==='raffle'?'':'ghost'}" onclick="adminTab='raffle';showAdmin()" style="flex:1">🎁 Sorteio</button>
       <button class="btn sm ${adminTab==='users'?'':'ghost'}" onclick="adminTab='users';showAdmin()" style="flex:1">${ic2("users",14)} Usuários</button>
       <button class="btn sm ${adminTab==='msgs'?'':'ghost'}" onclick="adminTab='msgs';showAdmin()" style="flex:1">${ic2("message-circle",14)} Msgs</button>
     </div>
     <div id="admin-content"><p class="sub pulse">Carregando…</p></div>`;
   if(adminTab==='events') loadAdminEvents();
+  else if(adminTab==='raffle') loadAdminRaffle();
   else if(adminTab==='pending') loadAdminPending();
   else if(adminTab==='users') loadAdminUsers();
   else loadAdminMsgs();
@@ -1088,6 +1209,77 @@ async function resetCheckins(){
   const{error}=await sb.from('profiles').update({at_party:false}).neq('id','00000000-0000-0000-0000-000000000000');
   if(error){toast('Erro: '+traduzir(error.message));return}
   me.at_party=false;toast('Check-ins resetados! ✓');
+}
+
+async function loadAdminRaffle(){
+  const c=$('#admin-content');
+  const week=getRaffleWeek();
+  const[entriesRes,winnersRes,flyerRes]=await Promise.all([
+    sb.from('raffle_entries').select('*, profiles(name,instagram)').eq('raffle_week',week).eq('shared',true),
+    sb.from('raffle_winners').select('*, profiles(name,instagram)').eq('raffle_week',week).order('position',{ascending:true}),
+    sb.from('raffle_flyer').select('*').eq('raffle_week',week).maybeSingle()
+  ]);
+  const entries=entriesRes.data||[];
+  const winners=winnersRes.data||[];
+  const flyer=flyerRes.data;
+  let h=`<div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">🎁 Sorteio ${week}</h2><p class="sub"><b style="color:var(--neon-green)">${entries.length}</b> pessoa${entries.length!==1?'s':''} participando</p></div>`;
+  // Flyer da semana
+  h+=`<label>Flyer da semana (story)</label>`;
+  if(flyer){h+=`<div class="flyer-preview" style="max-width:200px;margin:0 auto 10px"><img src="${esc(flyer.flyer_url)}"></div>`}
+  h+=`<input type="file" id="flyer-file" accept="image/*" class="hidden"><button class="btn ghost sm" onclick="$('#flyer-file').click()" style="margin:0 auto 10px;display:block">${ic2('image-plus',14)} ${flyer?'Trocar flyer':'Subir flyer'}</button>`;
+  h+=`<label>Link do evento</label><input id="flyer-link" placeholder="https://..." value="${flyer&&flyer.event_link?esc(flyer.event_link):''}"><button class="btn sm" onclick="saveFlyerLink()" style="margin-top:8px">${ic2('check',14)} Salvar link</button>`;
+  // Sorteio
+  h+=`<label style="margin-top:20px">Sorteio</label>`;
+  if(winners.length){
+    winners.forEach(w=>{const p=w.profiles;const medal=w.position===1?'🥇':w.position===2?'🥈':'🥉';h+=`<div class="winner-row">${medal}<div class="wr-info"><b>${esc(p?p.name:'?')} ${p&&p.instagram?'· @'+esc(p.instagram.replace('@','')):''}</b><span>${esc(w.prize)}</span></div></div>`});
+    h+=`<button class="btn ghost sm" onclick="drawRaffle()" style="margin-top:14px">${ic2('undo-2',14)} Sortear novamente</button>`;
+  }else{
+    if(entries.length<1){h+=`<p class="sub">Ninguém participou ainda essa semana.</p>`}
+    else{h+=`<button class="btn" onclick="drawRaffle()" style="margin-top:10px">🎲 Sortear ganhadores agora</button>`}
+  }
+  if(entries.length){
+    h+=`<label style="margin-top:20px">Participantes (${entries.length})</label>`;
+    entries.forEach(e=>{const p=e.profiles;h+=`<div class="row" style="cursor:default"><div class="rmain"><b>${esc(p?p.name:'?')}</b><span>${p&&p.instagram?'@'+esc(p.instagram.replace('@','')):''}</span></div></div>`});
+  }
+  c.innerHTML=h;
+  $('#flyer-file').onchange=uploadFlyer;
+}
+
+async function uploadFlyer(e){
+  const file=e.target.files[0];if(!file)return;
+  toast('Enviando flyer…');
+  const week=getRaffleWeek();
+  try{
+    const webp=await toWebP(file,1080,0.85);
+    const path=`flyers/${week}-${Date.now()}.webp`;
+    const{error:upErr}=await sb.storage.from('fotos').upload(path,webp,{contentType:'image/webp'});
+    if(upErr)throw upErr;
+    const url=sb.storage.from('fotos').getPublicUrl(path).data.publicUrl;
+    const link=$('#flyer-link')?$('#flyer-link').value.trim():'';
+    const{error}=await sb.from('raffle_flyer').upsert({raffle_week:week,flyer_url:url,event_link:link},{onConflict:'raffle_week'});
+    if(error)throw error;
+    toast('Flyer publicado! 🎉');loadAdminRaffle();
+  }catch(err){toast('Erro: '+traduzir(err.message||''))}
+}
+
+async function saveFlyerLink(){
+  const week=getRaffleWeek();
+  const link=$('#flyer-link').value.trim();
+  const{data:existing}=await sb.from('raffle_flyer').select('flyer_url').eq('raffle_week',week).maybeSingle();
+  if(!existing){toast('Sobe o flyer primeiro!');return}
+  const{error}=await sb.from('raffle_flyer').update({event_link:link}).eq('raffle_week',week);
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Link salvo! ✓');
+}
+
+async function drawRaffle(){
+  if(!confirm('Sortear os 3 ganhadores agora? Isso vai escolher aleatoriamente entre os participantes.'))return;
+  const week=getRaffleWeek();
+  const{data,error}=await sb.rpc('draw_raffle',{week});
+  if(error){toast('Erro: '+traduzir(error.message));return}
+  toast('Ganhadores sorteados! 🎉');
+  spawnConfetti();
+  loadAdminRaffle();
 }
 
 async function loadAdminPending(){

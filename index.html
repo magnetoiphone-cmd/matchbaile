@@ -731,20 +731,21 @@ async function showSwipe(){const s=$('#screen');s.className='screen-enter';
   const[lr,lmr,pr]=await Promise.all([
     sb.from('likes').select('liked').eq('liker',me.id),
     sb.from('likes').select('liker,is_super').eq('liked',me.id),
-    sb.from('profiles').select('id,name,age,instagram,bio,photo_url,photos,gender,at_party').eq('status','approved').eq('visible',true).neq('id',me.id)
+    sb.from('profiles').select('id,name,age,instagram,bio,photo_url,photos,gender,at_party,party_event_id').eq('status','approved').eq('visible',true).neq('id',me.id)
   ]);
   myLikes=new Set((lr.data||[]).map(l=>l.liked));likedMe=new Set((lmr.data||[]).map(l=>l.liker));
   let filtered=(pr.data||[]).filter(p=>!myLikes.has(p.id));
   if(me.preference==='homens')filtered=filtered.filter(p=>p.gender==='homem');
   else if(me.preference==='mulheres')filtered=filtered.filter(p=>p.gender==='mulher');
-  const atParty=(pr.data||[]).filter(p=>p.at_party).length+(me.at_party?1:0);
+  const eid=activeEvent?activeEvent.id:null;
+  const atParty=(pr.data||[]).filter(p=>p.at_party&&p.party_event_id===eid).length+((me.at_party&&me.party_event_id===eid)?1:0);
   const pc=$('#party-count');if(pc&&party.started)pc.innerHTML=`<div class="checkin-count">${ic2('map-pin',12)} <b>${atParty}</b> pessoa${atParty!==1?'s':''} na festa agora</div>`;
   // filter
-  if(swipeFilter==='festa')filtered=filtered.filter(p=>p.at_party);
+  if(swipeFilter==='festa')filtered=filtered.filter(p=>p.at_party&&p.party_event_id===eid);
   // sort: at_party first, then who liked me
   const lmArr=[...likedMe];
   filtered.sort((a,b)=>{
-    const aP=a.at_party?1:0,bP=b.at_party?1:0;
+    const aP=(a.at_party&&a.party_event_id===eid)?1:0,bP=(b.at_party&&b.party_event_id===eid)?1:0;
     if(aP!==bP)return bP-aP;
     const aL=lmArr.includes(a.id)?1:0,bL=lmArr.includes(b.id)?1:0;
     if(aL!==bL)return bL-aL;
@@ -761,16 +762,23 @@ function preloadDeckImages(){
   }
 }
 
+function isAtParty(p){
+  // Só está "na festa" se: festa rolando + fez check-in + no evento ATUAL
+  if(!partyLive||!p.at_party)return false;
+  if(!activeEvent)return false;
+  return p.party_event_id===activeEvent.id;
+}
 async function toggleCheckIn(){
   const newVal=!me.at_party;
-  const{error}=await sb.from('profiles').update({at_party:newVal}).eq('id',me.id);
+  const eventId=activeEvent?activeEvent.id:null;
+  const{error}=await sb.from('profiles').update({at_party:newVal,party_event_id:newVal?eventId:null}).eq('id',me.id);
   if(error){toast(traduzir(error.message));return}
-  me.at_party=newVal;
+  me.at_party=newVal;me.party_event_id=newVal?eventId:null;
   toast(newVal?'Check-in feito! 🎉':'Check-out feito.');
   showSwipe();
 }
 let cardPhotoIdx=0;
-function renderDeck(){const da=$('#deck-area');if(!da)return;if(!deck.length){da.innerHTML=`<div class="empty"><div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button></div>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const showParty=partyLive&&p.at_party;const partyTag=showParty?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';const partyClass=showParty?' at-party':'';
+function renderDeck(){const da=$('#deck-area');if(!da)return;if(!deck.length){da.innerHTML=`<div class="empty"><div class="big">🪩</div><h2>Acabou a pista!</h2><p class="sub">Volta mais tarde pra ver quem chegou.</p><button class="btn ghost" style="max-width:220px" onclick="showSwipe()">Atualizar</button></div>`;return}const p=deck[0];const photos=getPhotos(p);cardPhotoIdx=0;const gl={homem:'Homem',mulher:'Mulher',outro:'Outro'}[p.gender]||'';const showParty=isAtParty(p);const partyTag=showParty?`<span class="gender-tag" style="background:rgba(43,255,111,.15);color:var(--neon-green)">${ic2('map-pin',10)} Na festa</span>`:'';const partyClass=showParty?' at-party':'';
   // Pré-carrega TODAS as fotos deste card de uma vez
   photos.forEach(url=>{const im=new Image();im.src=thumb(url,600)});
   // Empilha todas as fotos no card (troca instantânea via opacity)
@@ -787,12 +795,12 @@ async function showMatches(){globalMsgCount=0;await loadActiveEvent();partyLive=
   if(whoLikedMe.length){const superCount=whoLikedMe.filter(l=>l.is_super).length;h+=`<div class="likes-teaser" onclick="toast('Continue dando like pra descobrir quem é! 👀')"><div class="lt-icon">${ic2('flame',28)}</div><div class="lt-text"><b>${whoLikedMe.length} pessoa${whoLikedMe.length>1?'s':''} curtiu você!</b><span>${superCount>0?`⭐ ${superCount} Super Like${superCount>1?'s':''} · `:''}Dá match pra descobrir quem 👀</span></div></div>`}
   const newMatches=matchIds.filter(id=>!lastMsg[id]);
   const activeChats=matchIds.filter(id=>lastMsg[id]);
-  if(newMatches.length){h+=`<label>Novos matches 🔥</label>`;newMatches.forEach(id=>{const p=profMap[id];if(!p)return;const dot=(partyLive&&p.at_party)?'<div class="online-dot"></div>':'';const pw=(partyLive&&p.at_party)?' at-party':'';h+=`<div class="swipe-row" data-id="${id}"><div class="row new-match" onclick="openChat('${id}')"><div class="img-wrap${pw}" onclick="event.stopPropagation();showProfileOverlay('${id}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120,true)}${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>Diz oi! 👋</span></div></div><div class="swipe-actions"><button class="sw-profile" onclick="showProfileOverlay('${id}')">${ic2('user',14)} Perfil</button><button class="sw-delete" onclick="deleteConvo('${id}','${esc(p.name)}')">${ic2('x',14)} Excluir</button></div></div>`})}
+  if(newMatches.length){h+=`<label>Novos matches 🔥</label>`;newMatches.forEach(id=>{const p=profMap[id];if(!p)return;const dot=isAtParty(p)?'<div class="online-dot"></div>':'';const pw=isAtParty(p)?' at-party':'';h+=`<div class="swipe-row" data-id="${id}"><div class="row new-match" onclick="openChat('${id}')"><div class="img-wrap${pw}" onclick="event.stopPropagation();showProfileOverlay('${id}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120,true)}${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>Diz oi! 👋</span></div></div><div class="swipe-actions"><button class="sw-profile" onclick="showProfileOverlay('${id}')">${ic2('user',14)} Perfil</button><button class="sw-delete" onclick="deleteConvo('${id}','${esc(p.name)}')">${ic2('x',14)} Excluir</button></div></div>`})}
   h+=`<label>Conversas</label>`;
   const sortedActive=activeChats.map(id=>({id,lm:lastMsg[id]})).sort((a,b)=>new Date(b.lm.created_at)-new Date(a.lm.created_at));
   if(!sortedActive.length&&!newMatches.length)h+=`<p class="sub">Nenhum match ainda. Bora arrastar! 🔥</p>`;
   else if(!sortedActive.length)h+=`<p class="sub">Nenhuma conversa ainda. Manda um oi!</p>`;
-  sortedActive.forEach(({id,lm:last},idx)=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=esc(last.content);if(last.content.startsWith('[img]'))preview='📷 Foto';if(last.sender===me.id)preview='Você: '+preview;const dot=(partyLive&&p.at_party)?'<div class="online-dot"></div>':'';const pw=(partyLive&&p.at_party)?' at-party':'';h+=`<div class="swipe-row" data-id="${id}" style="animation-delay:${idx*0.04}s"><div class="row" onclick="openChat('${id}')"><div class="img-wrap${pw}" onclick="event.stopPropagation();showProfileOverlay('${id}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120)}${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div><div class="swipe-actions"><button class="sw-profile" onclick="showProfileOverlay('${id}')">${ic2('user',14)} Perfil</button><button class="sw-delete" onclick="deleteConvo('${id}','${esc(p.name)}')">${ic2('x',14)} Excluir</button></div></div>`});
+  sortedActive.forEach(({id,lm:last},idx)=>{const p=profMap[id];if(!p)return;const unread=last&&last.sender!==me.id&&!last.is_read;let preview=esc(last.content);if(last.content.startsWith('[img]'))preview='📷 Foto';if(last.sender===me.id)preview='Você: '+preview;const dot=isAtParty(p)?'<div class="online-dot"></div>':'';const pw=isAtParty(p)?' at-party':'';h+=`<div class="swipe-row" data-id="${id}" style="animation-delay:${idx*0.04}s"><div class="row" onclick="openChat('${id}')"><div class="img-wrap${pw}" onclick="event.stopPropagation();showProfileOverlay('${id}')">${optimImg(getPhotos(p)[0]||p.photo_url,'',120)}${dot}</div><div class="rmain"><b>${esc(p.name)}</b><span>${preview}</span></div>${last?`<span class="time">${timeAgo(last.created_at)}</span>`:''}${unread?'<div class="unread-dot"></div>':''}</div><div class="swipe-actions"><button class="sw-profile" onclick="showProfileOverlay('${id}')">${ic2('user',14)} Perfil</button><button class="sw-delete" onclick="deleteConvo('${id}','${esc(p.name)}')">${ic2('x',14)} Excluir</button></div></div>`});
   mv.innerHTML=h;
   // Ativar swipe-to-reveal em cada row
   document.querySelectorAll('.swipe-row').forEach(initSwipeRow);
@@ -847,14 +855,14 @@ async function showProfileOverlay(userId){
       ${p.instagram?`<div class="ig"><a href="https://instagram.com/${encodeURIComponent(p.instagram.replace('@',''))}" target="_blank" style="color:var(--neon-amber);text-decoration:none;font-weight:700">@${esc(p.instagram.replace('@',''))}</a></div>`:''}
       <div class="tags">
         ${gl?`<span>${gl}</span>`:''}
-        ${(partyLive&&p.at_party)?`<span class="party">${ic2('map-pin',10)} Na festa</span>`:''}
+        ${isAtParty(p)?`<span class="party">${ic2('map-pin',10)} Na festa</span>`:''}
       </div>
       ${p.bio?`<p class="bio">${esc(p.bio)}</p>`:''}
     </div>`;
   document.body.appendChild(ov);
 }
 
-async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const dot=(partyLive&&other.at_party)?`<div style="width:8px;height:8px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 6px var(--neon-green);flex-shrink:0"></div>`:'';const chatEl=document.createElement('div');chatEl.className='chat-screen';chatEl.id='chat-screen';chatEl.innerHTML=`<div class="chat-header" style="position:relative"><button class="back" onclick="closeChat()">${ic2("arrow-left",22)}</button>${optimImg(getPhotos(other)[0]||other.photo_url,'',100,true)}<b onclick="showProfileOverlay('${otherId}')" style="cursor:pointer;flex:1">${esc(other.name)}</b>${dot}<button class="chat-menu-btn" onclick="toggleChatMenu('${otherId}','${esc(other.name)}')">⋯</button></div><div class="chat-msgs" id="chatmsgs"></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">${ic2('camera',18)}</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn send" onclick="sendMsg('${otherId}')">${ic2('send',18)}</button></div>`;document.body.appendChild(chatEl);$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
+async function openChat(otherId){currentChatId=otherId;if(chatSub)chatSub.unsubscribe();const{data:other}=await sb.from('profiles').select('*').eq('id',otherId).single();if(!other){toast('Perfil não encontrado.');return}const dot=isAtParty(other)?`<div style="width:8px;height:8px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 6px var(--neon-green);flex-shrink:0"></div>`:'';const chatEl=document.createElement('div');chatEl.className='chat-screen';chatEl.id='chat-screen';chatEl.innerHTML=`<div class="chat-header" style="position:relative"><button class="back" onclick="closeChat()">${ic2("arrow-left",22)}</button>${optimImg(getPhotos(other)[0]||other.photo_url,'',100,true)}<b onclick="showProfileOverlay('${otherId}')" style="cursor:pointer;flex:1">${esc(other.name)}</b>${dot}<button class="chat-menu-btn" onclick="toggleChatMenu('${otherId}','${esc(other.name)}')">⋯</button></div><div class="chat-msgs" id="chatmsgs"></div><div class="chat-input"><input type="file" id="chat-img-file" accept="image/*" class="hidden"><button class="cbtn img-btn" onclick="$('#chat-img-file').click()">${ic2('camera',18)}</button><input id="chat-in" placeholder="Mensagem…" maxlength="500"><button class="cbtn send" onclick="sendMsg('${otherId}')">${ic2('send',18)}</button></div>`;document.body.appendChild(chatEl);$('#chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg(otherId)});$('#chat-img-file').onchange=e=>sendImage(otherId,e);$('#nav').classList.add('hidden');await loadMessages(otherId);await sb.from('messages').update({is_read:true}).eq('sender',otherId).eq('receiver',me.id).eq('is_read',false);chatSub=sb.channel('chat-'+otherId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`receiver=eq.${me.id}`},payload=>{if(payload.new.sender===otherId){appendMsg(payload.new);sb.from('messages').update({is_read:true}).eq('id',payload.new.id).then(()=>{})}}).subscribe()}
 function toggleChatMenu(otherId,name){
   if($('#chat-dropdown')){closeChatMenu();return}
   const header=document.querySelector('.chat-header');if(!header)return;

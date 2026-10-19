@@ -768,13 +768,59 @@ function isAtParty(p){
   if(!activeEvent)return false;
   return p.party_event_id===activeEvent.id;
 }
+// Distância entre 2 pontos GPS em km (fórmula de Haversine)
+function distanceKm(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+// Pega a posição atual do usuário
+function getMyLocation(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){reject(new Error('sem-gps'));return}
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({lat:pos.coords.latitude,lng:pos.coords.longitude}),
+      err=>reject(err),
+      {enableHighAccuracy:true,timeout:12000,maximumAge:30000}
+    );
+  });
+}
+
 async function toggleCheckIn(){
-  const newVal=!me.at_party;
   const eventId=activeEvent?activeEvent.id:null;
-  const{error}=await sb.from('profiles').update({at_party:newVal,party_event_id:newVal?eventId:null}).eq('id',me.id);
+  // Check-out não precisa de GPS
+  if(me.at_party){
+    const{error}=await sb.from('profiles').update({at_party:false,party_event_id:null}).eq('id',me.id);
+    if(error){toast(traduzir(error.message));return}
+    me.at_party=false;me.party_event_id=null;
+    toast('Check-out feito.');showSwipe();return;
+  }
+  // Check-in: verifica localização se a festa tem GPS definido
+  if(activeEvent&&activeEvent.lat&&activeEvent.lng){
+    const btn=document.querySelector('.ci-btn');if(btn){btn.textContent='Localizando…';btn.disabled=true}
+    let loc;
+    try{loc=await getMyLocation()}
+    catch(e){
+      if(btn){btn.textContent='Fazer check-in';btn.disabled=false}
+      if(e.message==='sem-gps')toast('Seu dispositivo não tem GPS.');
+      else if(e.code===1)toast('Ative a localização pra fazer check-in 📍');
+      else toast('Não consegui pegar sua localização. Tenta de novo!');
+      return;
+    }
+    const raio=activeEvent.radius_km||1;
+    const dist=distanceKm(loc.lat,loc.lng,activeEvent.lat,activeEvent.lng);
+    if(dist>raio){
+      if(btn){btn.textContent='Fazer check-in';btn.disabled=false}
+      toast(`Você precisa estar na festa pra fazer check-in! 📍 (${dist.toFixed(1)}km de distância)`);
+      return;
+    }
+  }
+  const{error}=await sb.from('profiles').update({at_party:true,party_event_id:eventId}).eq('id',me.id);
   if(error){toast(traduzir(error.message));return}
-  me.at_party=newVal;me.party_event_id=newVal?eventId:null;
-  toast(newVal?'Check-in feito! 🎉':'Check-out feito.');
+  me.at_party=true;me.party_event_id=eventId;
+  toast('Check-in feito! Bem-vindo à festa! 🎉');
   showSwipe();
 }
 let cardPhotoIdx=0;
@@ -1157,7 +1203,7 @@ async function loadAdminEvents(){
         <div><h3>${esc(ev.name)}</h3><div class="ev-meta">${ic2('map-pin',12)} ${esc(ev.location||'Local não definido')} · ${dateStr} · ${timeStr}</div>${badge}</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
-        <button class="btn sm ghost" onclick="showEditEvent('${ev.id}','${esc(ev.name)}','${ev.date_time}','${esc(ev.location||'')}')" style="flex:1;min-width:45%">${ic2('pencil',14)} Editar</button>
+        <button class="btn sm ghost" onclick="showEditEvent('${ev.id}')" style="flex:1;min-width:45%">${ic2('pencil',14)} Editar</button>
         ${!ev.is_active?`<button class="btn sm" onclick="activateEvent('${ev.id}')" style="flex:1;min-width:45%;background:var(--neon-green);color:#000">${ic2('check',14)} Ativar</button>`:`<button class="btn sm ghost" onclick="deactivateEvent('${ev.id}')" style="flex:1;min-width:45%">${ic2('x',14)} Desativar</button>`}
         <button class="btn sm ghost" onclick="resetCheckins()" style="flex:1;min-width:45%">${ic2('undo-2',14)} Resetar check-ins</button>
         <button class="btn sm ghost" onclick="deleteEvent('${ev.id}','${esc(ev.name)}')" style="flex:1;min-width:45%;border-color:var(--tinder1);color:var(--tinder1)">${ic2('x',14)} Excluir</button>
@@ -1167,40 +1213,78 @@ async function loadAdminEvents(){
   c.innerHTML=h;
 }
 
+let evGeo=null; // {lat,lng} temporário do formulário
 function showCreateEventForm(){
+  evGeo=null;
   const c=$('#admin-content');
   c.innerHTML=`
     <h2>Nova festa</h2>
     <label>Nome da festa</label><input id="ev-name" maxlength="60" placeholder="Ex: Tokyo Match Vol. 2">
     <label>Data e hora</label><input id="ev-date" type="datetime-local">
     <label>Local</label><input id="ev-location" maxlength="100" placeholder="Ex: Eskina Lounge">
+    <label>Localização GPS (pra validar check-in)</label>
+    <div id="ev-geo-box">${geoBoxHtml(null,null)}</div>
+    <label>Raio do check-in (km)</label><input id="ev-radius" type="number" step="0.1" min="0.1" value="1">
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn ghost sm" onclick="loadAdminEvents()" style="flex:1">Cancelar</button>
       <button class="btn sm" onclick="createNewEvent()" style="flex:1">${ic2('check',14)} Criar festa</button>
     </div>`;
 }
 
+function geoBoxHtml(lat,lng){
+  if(lat&&lng){
+    return `<div style="display:flex;align-items:center;gap:8px;background:rgba(52,211,153,.08);border:1px solid var(--neon-green);border-radius:12px;padding:12px 14px;margin-bottom:8px">
+      <span style="color:var(--neon-green);font-size:13px;flex:1">📍 Localização marcada<br><span style="font-size:11px;color:var(--dim)">${lat.toFixed(5)}, ${lng.toFixed(5)}</span></span>
+      <button class="btn ghost sm" onclick="captureGeo()" style="margin:0">Atualizar</button>
+    </div>`;
+  }
+  return `<button class="btn ghost sm" onclick="captureGeo()" style="margin:0 0 8px;display:block;width:100%">${ic2('map-pin',14)} Usar localização atual</button>
+    <p class="sub" style="font-size:11px;margin:0 0 8px">Esteja no local da festa e toque acima. Deixe em branco pra não validar GPS.</p>`;
+}
+
+async function captureGeo(){
+  toast('Pegando sua localização…');
+  try{
+    const loc=await getMyLocation();
+    evGeo={lat:loc.lat,lng:loc.lng};
+    const box=$('#ev-geo-box');if(box)box.innerHTML=geoBoxHtml(loc.lat,loc.lng);
+    toast('Localização marcada! 📍');
+  }catch(e){
+    if(e&&e.code===1)toast('Ative a permissão de localização.');
+    else toast('Não consegui pegar a localização.');
+  }
+}
+
 async function createNewEvent(){
   const name=$('#ev-name').value.trim();
   const dateVal=$('#ev-date').value;
   const location=$('#ev-location').value.trim();
+  const radius=parseFloat($('#ev-radius').value)||1;
   if(!name){toast('Dá um nome pra festa!');return}
   if(!dateVal){toast('Escolhe a data e hora!');return}
   const date_time=new Date(dateVal).toISOString();
-  const{error}=await sb.from('events').insert({name,date_time,location,is_active:false});
+  const row={name,date_time,location,is_active:false,radius_km:radius};
+  if(evGeo){row.lat=evGeo.lat;row.lng=evGeo.lng}
+  const{error}=await sb.from('events').insert(row);
   if(error){toast('Erro: '+traduzir(error.message));return}
   toast('Festa criada! 🎉');loadAdminEvents();
 }
 
-function showEditEvent(id,name,dateTime,location){
+async function showEditEvent(id){
   const c=$('#admin-content');
-  const d=new Date(dateTime);
+  const{data:ev}=await sb.from('events').select('*').eq('id',id).maybeSingle();
+  if(!ev){toast('Festa não encontrada.');return}
+  evGeo=(ev.lat&&ev.lng)?{lat:ev.lat,lng:ev.lng}:null;
+  const d=new Date(ev.date_time);
   const localDate=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
   c.innerHTML=`
     <h2>${ic2('pencil',18)} Editar festa</h2>
-    <label>Nome da festa</label><input id="ev-name" maxlength="60" value="${esc(name)}">
+    <label>Nome da festa</label><input id="ev-name" maxlength="60" value="${esc(ev.name)}">
     <label>Data e hora</label><input id="ev-date" type="datetime-local" value="${localDate}">
-    <label>Local</label><input id="ev-location" maxlength="100" value="${esc(location)}">
+    <label>Local</label><input id="ev-location" maxlength="100" value="${esc(ev.location||'')}">
+    <label>Localização GPS (pra validar check-in)</label>
+    <div id="ev-geo-box">${geoBoxHtml(ev.lat||null,ev.lng||null)}</div>
+    <label>Raio do check-in (km)</label><input id="ev-radius" type="number" step="0.1" min="0.1" value="${ev.radius_km||1}">
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn ghost sm" onclick="loadAdminEvents()" style="flex:1">Cancelar</button>
       <button class="btn sm" onclick="saveEditEvent('${id}')" style="flex:1">${ic2('check',14)} Salvar</button>
@@ -1211,10 +1295,12 @@ async function saveEditEvent(id){
   const name=$('#ev-name').value.trim();
   const dateVal=$('#ev-date').value;
   const location=$('#ev-location').value.trim();
+  const radius=parseFloat($('#ev-radius').value)||1;
   if(!name){toast('Dá um nome pra festa!');return}
   if(!dateVal){toast('Escolhe a data e hora!');return}
   const date_time=new Date(dateVal).toISOString();
-  const{error}=await sb.from('events').update({name,date_time,location}).eq('id',id);
+  const row={name,date_time,location,radius_km:radius,lat:evGeo?evGeo.lat:null,lng:evGeo?evGeo.lng:null};
+  const{error}=await sb.from('events').update(row).eq('id',id);
   if(error){toast('Erro: '+traduzir(error.message));return}
   toast('Festa atualizada! ✓');loadAdminEvents();
 }
